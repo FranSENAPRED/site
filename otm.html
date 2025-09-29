@@ -1,72 +1,39 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Botonera de Enlaces</title>
-    <!-- Si lo vas a embeber por <iframe> desde GitHub Pages, este CDN funciona bien.
-         Si lo alojas dentro de SharePoint con Custom Script deshabilitado, quita esta línea. -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .btn-gray-style { background-color: #6b7280; color: #fff; } /* gris + texto blanco */
-        .btn-style:hover { box-shadow: 0 4px 6px rgba(0,0,0,.1); transform: translateY(-2px); }
-        .btn-grid {
-            display: grid; grid-template-columns: 1fr; gap: 12px; padding: 16px;
-            max-width: 800px; margin: 0 auto;
-        }
-        @media (min-width: 640px) { .btn-grid { grid-template-columns: 1fr 1fr; } }
-    </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Botonera de Enlaces</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .btn-gray-style{ background:#6b7280; color:#fff; }
+    .btn-style:hover{ box-shadow:0 4px 6px rgba(0,0,0,.1); transform:translateY(-2px); }
+    .btn-grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr; /* <- dos columnas SIEMPRE */
+      gap:12px; padding:16px; max-width:900px; margin:0 auto;
+    }
+  </style>
 </head>
 <body class="bg-white">
-
   <div class="btn-grid">
-    <a href="https://www.meteochile.gob.cl/"
-       target="_blank" rel="noopener noreferrer"
-       class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition duration-300">DMC</a>
+    <a href="https://www.meteochile.gob.cl/"  target="_blank" rel="noopener" class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition">DMC</a>
+    <a href="https://www.shoa.cl/"            target="_blank" rel="noopener" class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition">SHOA</a>
 
-    <a href="https://www.shoa.cl/"
-       target="_blank" rel="noopener noreferrer"
-       class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition duration-300">SHOA</a>
+    <a href="https://www.sernageomin.cl/"     target="_blank" rel="noopener" class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition">SERNAGEOMIN</a>
+    <a href="https://www.conaf.cl/"           target="_blank" rel="noopener" class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition">CONAF</a>
 
-    <a href="https://www.sernageomin.cl/"
-       target="_blank" rel="noopener noreferrer"
-       class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition duration-300">SERNAGEOMIN</a>
+    <a href="https://www.sismologia.cl/"      target="_blank" rel="noopener" class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition">CSN</a>
+    <a href="https://dga.mop.gob.cl/"         target="_blank" rel="noopener" class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition">DGA</a>
 
-    <a href="https://www.conaf.cl/"
-       target="_blank" rel="noopener noreferrer"
-       class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition duration-300">CONAF</a>
+    <a href="http://www.servimet.cl/"         target="_blank" rel="noopener" class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition">SERVIMET</a>
+    <a href="https://www.cchen.cl/"           target="_blank" rel="noopener" class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition">CCHEN</a>
 
-    <a href="https://www.sismologia.cl/"
-       target="_blank" rel="noopener noreferrer"
-       class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition duration-300">CSN</a>
+    <a href="https://www.sag.gob.cl/"         target="_blank" rel="noopener" class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition">SAG</a>
+    <a href="https://www.minsal.cl/"          target="_blank" rel="noopener" class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition">MINSAL</a>
 
-    <a href="https://dga.mop.gob.cl/"
-       target="_blank" rel="noopener noreferrer"
-       class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition duration-300">DGA</a>
-
-    <a href="http://www.servimet.cl/"
-       target="_blank" rel="noopener noreferrer"
-       class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition duration-300">SERVIMET</a>
-
-    <a href="https://www.cchen.cl/"
-       target="_blank" rel="noopener noreferrer"
-       class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition duration-300">CCHEN</a>
-
-    <a href="https://www.sag.gob.cl/"
-       target="_blank" rel="noopener noreferrer"
-       class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition duration-300">SAG</a>
-
-    <a href="https://www.minsal.cl/"
-       target="_blank" rel="noopener noreferrer"
-       class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition duration-300">MINSAL</a>
-
-    <a href="https://www.bomberos.cl/"
-       target="_blank" rel="noopener noreferrer"
-       class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition duration-300">Bomberos de Chile</a>
-
-    <a href="https://www.doh.gob.cl/"
-       target="_blank" rel="noopener noreferrer"
-       class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition duration-300">DOH</a>
+    <a href="https://www.bomberos.cl/"        target="_blank" rel="noopener" class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition">Bomberos de Chile</a>
+    <a href="https://www.doh.gob.cl/"         target="_blank" rel="noopener" class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition">DOH</a>
   </div>
-
 </body>
 </html>
+
