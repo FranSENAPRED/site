@@ -1,98 +1,72 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Organismos Técnicos de Monitoreo</title>
+    <title>Botonera de Enlaces</title>
+    <!-- Si lo vas a embeber por <iframe> desde GitHub Pages, este CDN funciona bien.
+         Si lo alojas dentro de SharePoint con Custom Script deshabilitado, quita esta línea. -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        .btn-gray-style { background-color: #6b7280; color: #fff; } /* gris + texto blanco */
+        .btn-style:hover { box-shadow: 0 4px 6px rgba(0,0,0,.1); transform: translateY(-2px); }
+        .btn-grid {
+            display: grid; grid-template-columns: 1fr; gap: 12px; padding: 16px;
+            max-width: 800px; margin: 0 auto;
         }
-        .container {
-            width: 100%;
-            margin: 0 auto;
-        }
-        h1 {
-            text-align: center;
-            color: #1E3A8A;
-        }
-        .table-container {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 20px;
-        }
-        .table {
-            border: 1px solid #ddd;
-            width: 45%;
-            padding: 10px;
-            border-radius: 10px;
-            background-color: #F1F5F9;
-        }
-        .table h3 {
-            background-color: #1E3A8A;
-            color: white;
-            padding: 10px;
-            text-align: center;
-            border-radius: 8px;
-        }
-        .table p {
-            margin-bottom: 10px;
-        }
-        .table ul {
-            list-style: none;
-            padding-left: 0;
-        }
-        .table ul li {
-            background-color: #F3F4F6;
-            margin: 5px 0;
-            padding: 5px;
-            border-radius: 5px;
-            text-align: center;
-        }
-        .otm-amenaza {
-            background-color: #4CAF50;
-        }
-        .otm-sectorial {
-            background-color: #2196F3;
-        }
+        @media (min-width: 640px) { .btn-grid { grid-template-columns: 1fr 1fr; } }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>Organismos Técnicos de Monitoreo</h1>
-        <div class="table-container">
-            <div class="table">
-                <h3>OTM de la Amenaza</h3>
-                <p>Entidades públicas o privadas del SINAPRED, con competencias técnicas para mantener un monitoreo permanente de las diferentes amenazas.</p>
-                <p>Comunican al Servicio el estado de las amenazas, nivel de peligrosidad, alcance y amplitud.</p>
-                <ul>
-                    <li class="otm-amenaza">DMC</li>
-                    <li class="otm-amenaza">SERNAGEOMIN</li>
-                    <li class="otm-amenaza">CSN</li>
-                    <li class="otm-amenaza">SERVIMET</li>
-                    <li class="otm-amenaza">SAG</li>
-                    <li class="otm-amenaza">Bomberos de Chile</li>
-                    <li class="otm-amenaza">SHOA</li>
-                    <li class="otm-amenaza">CONAF</li>
-                    <li class="otm-amenaza">DGA</li>
-                    <li class="otm-amenaza">CCHEN</li>
-                </ul>
-            </div>
-            <div class="table">
-                <h3>OTM Sectorial</h3>
-                <p>Entidades del SINAPRED que cuentan con competencias técnicas para mantener la supervisión sectorial de servicios e infraestructura.</p>
-                <ul>
-                    <li class="otm-sectorial">SEC</li>
-                    <li class="otm-sectorial">SISS</li>
-                    <li class="otm-sectorial">MMA</li>
-                    <li class="otm-sectorial">SERNAPESCA</li>
-                    <li class="otm-sectorial">MINSAL</li>
-                    <li class="otm-sectorial">MOP</li>
-                    <li class="otm-sectorial">SUBTRANS</li>
-                    <li class="otm-sectorial">SUBTEL</li>
-                </ul>
-            </div>
-        </div>
-    </div>
+<body class="bg-white">
+
+  <div class="btn-grid">
+    <a href="https://www.meteochile.gob.cl/"
+       target="_blank" rel="noopener noreferrer"
+       class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition duration-300">DMC</a>
+
+    <a href="https://www.shoa.cl/"
+       target="_blank" rel="noopener noreferrer"
+       class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition duration-300">SHOA</a>
+
+    <a href="https://www.sernageomin.cl/"
+       target="_blank" rel="noopener noreferrer"
+       class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition duration-300">SERNAGEOMIN</a>
+
+    <a href="https://www.conaf.cl/"
+       target="_blank" rel="noopener noreferrer"
+       class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition duration-300">CONAF</a>
+
+    <a href="https://www.sismologia.cl/"
+       target="_blank" rel="noopener noreferrer"
+       class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition duration-300">CSN</a>
+
+    <a href="https://dga.mop.gob.cl/"
+       target="_blank" rel="noopener noreferrer"
+       class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition duration-300">DGA</a>
+
+    <a href="http://www.servimet.cl/"
+       target="_blank" rel="noopener noreferrer"
+       class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition duration-300">SERVIMET</a>
+
+    <a href="https://www.cchen.cl/"
+       target="_blank" rel="noopener noreferrer"
+       class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition duration-300">CCHEN</a>
+
+    <a href="https://www.sag.gob.cl/"
+       target="_blank" rel="noopener noreferrer"
+       class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition duration-300">SAG</a>
+
+    <a href="https://www.minsal.cl/"
+       target="_blank" rel="noopener noreferrer"
+       class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition duration-300">MINSAL</a>
+
+    <a href="https://www.bomberos.cl/"
+       target="_blank" rel="noopener noreferrer"
+       class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition duration-300">Bomberos de Chile</a>
+
+    <a href="https://www.doh.gob.cl/"
+       target="_blank" rel="noopener noreferrer"
+       class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition duration-300">DOH</a>
+  </div>
+
 </body>
 </html>
