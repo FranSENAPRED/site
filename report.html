@@ -1,124 +1,25 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Informe Power BI — Cargando</title>
-<style>
-  :root{
-    --bg:#ffffff; --ink:#0f172a;
-    --brand:#1e3a8a; --brand2:#2f4ea3;
-    --muted:#64748b; --ok:#16a34a; --warn:#b45309;
-    --radius:14px; --shadow:0 10px 20px rgba(2,6,23,.08),0 2px 4px rgba(2,6,23,.06);
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);
-       font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,"Noto Sans";}
-  .wrap{max-width:1200px;margin:0 auto;padding:18px}
-  .card{border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid #e5e7eb;overflow:hidden}
-  .head{padding:18px;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff}
-  .head h1{margin:0;font-size:18px;font-weight:800;letter-spacing:.2px}
-  .body{padding:18px;background:#fff}
-  .row{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
-  .spinner{width:22px;height:22px;border-radius:50%;
-           border:3px solid rgba(255,255,255,.0); border-top-color:var(--brand);
-           border-left-color:var(--brand); animation:spin .9s linear infinite}
-  @keyframes spin{to{transform:rotate(360deg)}}
-
-  .hint{color:var(--muted); font-size:14px; margin-top:6px}
-  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-  .btn{appearance:none;border:0;border-radius:10px;padding:10px 14px;font-weight:600;cursor:pointer}
-  .btn.primary{background:var(--brand);color:#fff}
-  .btn.ghost{background:#fff;border:1px solid #c7d2fe;color:var(--brand)}
-  .btn.warn{background:#fff3cd;border:1px solid #f59e0b;color:#92400e}
-  .frameBox{margin-top:14px;border-top:1px solid #e5e7eb}
-  iframe{width:100%;height:70vh;border:0}
-
-  .note{display:none;margin-top:10px;padding:10px;border-radius:10px;background:#fff7ed;border:1px solid #fed7aa;color:#7c2d12}
-  .note.show{display:block}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Power BI</title>
+  <style>
+    /* Página sin márgenes; el iframe ocupa toda la altura visible */
+    html, body { height: 100%; margin: 0; }
+    .wrap { height: 100vh; }
+    iframe { width: 100%; height: 100%; border: 0; display: block; }
+  </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="card">
-    <div class="head">
-      <h1>Informe de Power BI</h1>
-    </div>
-    <div class="body">
-      <div class="row" id="statusRow" aria-live="polite">
-        <div class="spinner" aria-hidden="true"></div>
-        <div>
-          <strong>Cargando el informe…</strong>
-          <div class="hint">Esto puede tardar unos segundos. Si no aparece, usa las opciones de abajo.</div>
-        </div>
-      </div>
-
-      <div class="actions">
-        <button class="btn primary" id="openNew">Abrir en pestaña nueva</button>
-        <button class="btn ghost" id="retry">Reintentar</button>
-      </div>
-
-      <div class="note" id="slowNote">
-        El informe está tardando más de lo esperado. Si el bloqueo persiste, verifica que:
-        <ul style="margin:8px 0 0 18px">
-          <li>Tienes permiso de acceso al informe en Power BI.</li>
-          <li>El dominio está permitido por políticas de tu organización.</li>
-          <li>Las cookies de terceros no estén bloqueadas en el navegador.</li>
-        </ul>
-      </div>
-
-      <div class="frameBox">
-        <iframe id="report" title="Power BI report" allowfullscreen></iframe>
-      </div>
-    </div>
+  <!-- Reemplaza la URL por tu enlace de "view?r=" o "publicar en web" -->
+  <div class="wrap">
+    <iframe
+      src="https://app.powerbi.com/view?r=eyJrIjoiNDlmYTk3OGUtMGUwNS00MTdlLTk0MWQtNWFhOWI0ODRkZDNlIiwidCI6ImM0YzcwZTZhLWJmMWMtNGM1NS05ODYyLTU5YTVmM2FjODI1NyJ9"
+      title="Informe Power BI"
+      allowfullscreen
+      referrerpolicy="no-referrer-when-downgrade">
+    </iframe>
   </div>
-</div>
-
-<script>
-  // 🔧 Pega aquí tu URL de "publicar en web" o "view?r=" (embed) de Power BI:
-  const REPORT_URL = "https://app.powerbi.com/view?r=eyJrIjoiNDlmYTk3OGUtMGUwNS00MTdlLTk0MWQtNWFhOWI0ODRkZDNlIiwidCI6ImM0YzcwZTZhLWJmMWMtNGM1NS05ODYyLTU5YTVmM2FjODI1NyJ9";
-
-  const iframe = document.getElementById('report');
-  const openNew = document.getElementById('openNew');
-  const retry = document.getElementById('retry');
-  const slowNote = document.getElementById('slowNote');
-  const statusRow = document.getElementById('statusRow');
-
-  function setSrc(bust=false){
-    const v = bust ? (REPORT_URL + (REPORT_URL.includes('?') ? '&' : '?') + 'v=' + Date.now()) : REPORT_URL;
-    iframe.src = v;
-  }
-
-  // acciones
-  openNew.onclick = () => window.open(REPORT_URL, '_blank', 'noopener');
-  retry.onclick   = () => { slowNote.classList.remove('show'); setSrc(true); startWatch(); };
-
-  // monitorea carga
-  let timerSlow, timerDone;
-  function startWatch(){
-    clearTimeout(timerSlow); clearTimeout(timerDone);
-    statusRow.querySelector('.spinner').style.display = 'inline-block';
-    statusRow.querySelector('strong').textContent = 'Cargando el informe…';
-
-    // si tarda > 10s, mostrar nota
-    timerSlow = setTimeout(()=> slowNote.classList.add('show'), 10000);
-
-    // fallback: si en 60s no hay evento load, mantener las acciones visibles
-    timerDone = setTimeout(()=> {
-      statusRow.querySelector('.spinner').style.display = 'none';
-      statusRow.querySelector('strong').textContent = 'No pudimos confirmar la carga.';
-    }, 60000);
-  }
-
-  iframe.addEventListener('load', () => {
-    clearTimeout(timerSlow); slowNote.classList.remove('show');
-    statusRow.querySelector('.spinner').style.display = 'none';
-    statusRow.querySelector('strong').textContent = 'Informe listo.';
-  });
-
-  // inicializa
-  setSrc(false);
-  startWatch();
-</script>
 </body>
 </html>
