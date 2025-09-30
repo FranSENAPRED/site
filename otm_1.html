@@ -1,26 +1,44 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>OTM Sectorial</title>
 <style>
-  body{margin:0;background:#fff;font-family:Segoe UI,Arial,Helvetica,sans-serif}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:900px;margin:0 auto;padding:16px}
-  .btn{display:block;background:#9ec5f8;color:#0f1f3a;border-radius:12px;text-align:center;
-       font-weight:700;padding:12px;transition:.2s;border:none;text-decoration:none}
-  .btn:hover{box-shadow:0 4px 6px rgba(0,0,0,.12);transform:translateY(-2px)}
+  :root{
+    --btn-bg:#3B5FBF;        /* azul corporativo */
+    --btn-text:#ffffff;
+    --btn-bg-hover:#2f4ea3;  /* azul más oscuro */
+    --focus:#c7d2fe;
+    --gap:12px; --radius:12px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#fff;color:#0f172a;font-family:Segoe UI,Arial,Helvetica,sans-serif}
+  .wrap{max-width:900px;margin:0 auto;padding:16px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
+  .btn{
+    display:block;text-decoration:none;text-align:center;
+    background:var(--btn-bg);color:var(--btn-text);
+    padding:12px;border-radius:var(--radius);
+    font-weight:700;line-height:1.2;
+    transition:background .15s ease, transform .05s ease;
+  }
+  .btn:hover{background:var(--btn-bg-hover);transform:translateY(-2px)}
+  .btn:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
 </style>
 </head>
 <body>
-  <div class="grid">
-    <a class="btn" href="https://www.sec.cl/"          target="_blank" rel="noopener">SEC</a>
-    <a class="btn" href="https://www.siss.gob.cl/"     target="_blank" rel="noopener">SISS</a>
-    <a class="btn" href="https://www.minsal.cl/"       target="_blank" rel="noopener">MINSAL</a>
-    <a class="btn" href="https://mma.gob.cl/"          target="_blank" rel="noopener">MMA</a>
-    <a class="btn" href="https://www.mop.cl/"          target="_blank" rel="noopener">MOP</a>
-    <a class="btn" href="https://www.sernapesca.cl/"   target="_blank" rel="noopener">SERNAPESCA</a>
-    <a class="btn" href="https://www.subtel.gob.cl/"   target="_blank" rel="noopener">SUBTEL</a>
-    <a class="btn" href="https://www.subtrans.gob.cl/" target="_blank" rel="noopener">SUBTRANS</a>
+  <div class="wrap">
+    <div class="grid" aria-label="OTM Sectorial">
+      <a class="btn" href="https://www.sec.cl/"          target="_blank" rel="noopener">SEC</a>
+      <a class="btn" href="https://www.siss.gob.cl/"     target="_blank" rel="noopener">SISS</a>
+      <a class="btn" href="https://www.minsal.cl/"       target="_blank" rel="noopener">MINSAL</a>
+      <a class="btn" href="https://mma.gob.cl/"          target="_blank" rel="noopener">MMA</a>
+      <a class="btn" href="https://www.mop.cl/"          target="_blank" rel="noopener">MOP</a>
+      <a class="btn" href="https://www.sernapesca.cl/"   target="_blank" rel="noopener">SERNAPESCA</a>
+      <a class="btn" href="https://www.subtel.gob.cl/"   target="_blank" rel="noopener">SUBTEL</a>
+      <a class="btn" href="https://www.subtrans.gob.cl/" target="_blank" rel="noopener">SUBTRANS</a>
+    </div>
   </div>
 </body>
 </html>
