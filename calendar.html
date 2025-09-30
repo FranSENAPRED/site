@@ -7,11 +7,12 @@
     <!-- Carga de Tailwind CSS para un diseño profesional y responsive -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Configuración personalizada de Tailwind */
+        /* Configuración personalizada de Tailwind usando la paleta corporativa del usuario */
         :root {
-            --color-primary: #1e40af; /* Tailwind Blue 800 (Fuerte) */
-            --color-secondary: #f3f4f6; /* Tailwind Gray 100 (Cabeceras Días) */
-            --color-background: #f9fafb; /* Fondo General */
+            --color-primary: #144372; /* Azul Oscuro corporativo (20, 67, 114) */
+            --color-secondary: #999999; /* Gris medio (153, 153, 153) para cabeceras y bases */
+            --color-weekend: #E56A54; /* Color secundario (Rojo/Coral) para fines de semana */
+            --color-background: #f9fafb; /* Fondo General (Gris muy claro) */
         }
         body {
             font-family: 'Inter', sans-serif;
@@ -19,23 +20,21 @@
         }
         /* Contenedor principal del componente */
         .main-container {
-            /* Se hace más pequeño el contenedor principal para que se ajuste mejor en SharePoint */
             max-width: 100%; 
             font-size: 0.75rem; /* Base font size: text-xs (compact) */
         }
         .planning-grid-wrapper {
-            /* Contenedor que maneja el desplazamiento horizontal */
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
         }
         .planning-table {
-            border-collapse: separate; /* Necesario para bordes y sticky column */
+            border-collapse: separate; 
             border-spacing: 0;
             min-width: 100%;
         }
         .header-cell {
             min-width: 30px; 
-            font-size: 0.75rem; /* text-xs */
+            font-size: 0.75rem; 
             height: 30px; 
             padding: 0;
             line-height: 30px;
@@ -51,12 +50,12 @@
             padding-right: 0.5rem;
             font-weight: 500;
             background-color: inherit; 
-            border-right: 1px solid #e5e7eb; /* Gray 200 */
+            border-right: 1px solid #e5e7eb; 
             white-space: nowrap; 
             overflow: hidden;
             text-overflow: ellipsis;
-            font-size: 0.75rem; /* text-xs */
-            line-height: 1.25rem; /* Adjusted for tighter spacing */
+            font-size: 0.75rem; 
+            line-height: 1.25rem; 
         }
         /* Sticky Corners (Top-Left) */
         .sticky-corner-header {
@@ -72,18 +71,18 @@
             left: 0;
             top: 30px; 
             z-index: 30;
-            background-color: #f3f4f6; 
+            background-color: #d1d5db; /* Gris más claro que el secundario para contraste */
             border-right: 1px solid #d1d5db;
         }
         /* Grupo Header Sticky */
         .group-header-row .sticky-region-col {
-            background-color: #d1d5db !important;
+            background-color: #d1d5db !important; /* Gris claro de Tailwind */
             font-weight: bold;
             text-transform: uppercase;
             z-index: 20;
-            font-size: 0.875rem; /* text-sm for group headers */
-            white-space: normal; /* Permite saltos de línea para el subtítulo */
-            line-height: 1.1; /* Ajuste para el interlineado en el header */
+            font-size: 0.875rem; 
+            white-space: normal; 
+            line-height: 1.1; 
         }
         /* Estilo para el día de planificación (Bloque azul oscuro) */
         .marked-day {
@@ -92,7 +91,18 @@
             transition: background-color 0.1s ease;
         }
         .marked-day:hover {
-            background-color: #1d4ed8; /* Blue 700 al pasar el ratón */
+            background-color: #0B2641; /* Azul muy oscuro del primer color de la paleta */
+        }
+
+        /* Días de la semana (Lunes a Viernes) */
+        .weekday-bg {
+            background-color: var(--color-primary); 
+            color: white;
+        }
+        /* Fines de semana (Sábado y Domingo) */
+        .weekend-bg {
+            background-color: var(--color-weekend); 
+            color: white;
         }
 
         /* Modal Styles - Mantener el tamaño para buena UX */
@@ -157,7 +167,7 @@
         <div class="p-4 bg-gray-50 border-t border-gray-200 rounded-b-xl">
             <h3 class="text-xs font-semibold text-gray-600 mb-1">Observaciones:</h3>
             <p class="text-[0.65rem] text-gray-500">
-                La fecha marcada en azul oscuro ($\blacksquare$) indica un día de prueba de enlaces satelitales programado para la región o autoridad correspondiente.
+                La fecha marcada en azul oscuro ($\blacksquare$) indica un día de prueba de enlaces satelitales programado para la región o autoridad correspondiente. Los fines de semana están marcados en color secundario (rojo/coral).
             </p>
             <p class="text-[0.65rem] text-red-500 mt-1">
                 *Datos de Octubre, Noviembre y Diciembre 2025 son de ejemplo (mockup) basados en el patrón de Septiembre.
@@ -193,6 +203,7 @@
         // Meses de planificación (Septiembre a Diciembre 2025)
         const START_MONTH = 8; 
         const END_MONTH = 11; 
+        const YEAR = 2025; // El año de la planificación
 
         // Estructura de datos: { [Nombre Entidad]: { [Índice Mes 0-11]: [Día 1, Día 2, ...] } }
         const planningData = {
@@ -249,8 +260,21 @@
         ];
 
         // --- 2. LÓGICA DEL CALENDARIO Y MODAL ---
-        let currentMonth = 8; // Septiembre (0-indexed)
-        let currentYear = 2025;
+        
+        // 1. Determinar el mes inicial automáticamente
+        let initialMonth = START_MONTH;
+        const today = new Date();
+        
+        // Solo aplicar si estamos en el mismo año de planificación (2025) y dentro del rango de meses
+        if (today.getFullYear() === YEAR) {
+            const currentMonthIndex = today.getMonth();
+            if (currentMonthIndex >= START_MONTH && currentMonthIndex <= END_MONTH) {
+                initialMonth = currentMonthIndex;
+            }
+        }
+        
+        let currentMonth = initialMonth; 
+        let currentYear = YEAR;
 
         /**
          * Obtiene el número de días del mes.
@@ -260,10 +284,11 @@
         }
 
         /**
-         * Obtiene el día de la semana para el primer día del mes (1=Lunes).
+         * Obtiene el día de la semana para el primer día del mes (1=Lunes, 7=Domingo).
          */
         function getFirstDayOfMonth(year, month) {
             let day = new Date(year, month, 1).getDay();
+            // Corregir: 0 (Domingo) debe ser 7 para que el Lunes sea 1
             return day === 0 ? 7 : day;
         }
 
@@ -308,12 +333,14 @@
             
             for (let i = 1; i <= daysInMonth; i++) {
                 const dayIndex = (firstDay + i - 2) % 7; 
-                const dayLabel = dayLabels[dayIndex < 0 ? dayIndex + 7 : dayIndex];
-                const isWeekend = dayLabel === 'Sá' || dayLabel === 'Do';
+                // Asegura que el índice del día de la semana sea 0-6
+                const correctedDayIndex = dayIndex < 0 ? dayIndex + 7 : dayIndex; 
+                const dayLabel = dayLabels[correctedDayIndex];
+                const isWeekend = correctedDayIndex >= 5; // 5=Sá, 6=Do
 
                 dayOfWeekRow += `
                     <th class="header-cell border-r border-gray-300 sticky top-0 z-10 
-                        ${isWeekend ? 'bg-red-300 text-red-800' : 'bg-blue-300 text-blue-800'}">
+                        ${isWeekend ? 'weekend-bg' : 'weekday-bg'}">
                         ${dayLabel}
                     </th>
                 `;
@@ -330,8 +357,13 @@
                     </th>
             `;
             for (let i = 1; i <= daysInMonth; i++) {
+                 const dayIndex = (firstDay + i - 2) % 7; 
+                 const correctedDayIndex = dayIndex < 0 ? dayIndex + 7 : dayIndex; 
+                 const isWeekend = correctedDayIndex >= 5;
+
                 dayNumberRow += `
-                    <th class="header-cell border-r border-gray-300 text-gray-900 font-bold sticky top-[30px] z-10 bg-gray-100">
+                    <th class="header-cell border-r border-gray-300 font-bold sticky top-[30px] z-10 
+                        ${isWeekend ? 'bg-red-200 text-gray-900' : 'bg-gray-100 text-gray-900'}">
                         ${i}
                     </th>
                 `;
