@@ -3,51 +3,39 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Sistema de Alerta Temprana</title>
+<title>Unidades que conforman el Sistema de Alerta Temprana</title>
 <meta name="color-scheme" content="light dark">
 <style>
   :root{
     --bg:#f6f7fb; --ink:#111827;
-    --brand:#1e3a8a; --brand-2:#2f4ea3;
-    --c1:#3b82f6; --c2:#2563eb; --c3:#1d4ed8; --c4:#111827;
+    --brand:#1e3a8a; --brand-2:#2f4ea3;       /* banner */
+    --c1:#3b82f6; --c2:#2563eb; --c3:#1d4ed8; --c4:#111827; /* cards */
     --radius:16px;
     --shadow:0 10px 20px rgba(2,6,23,.08), 0 2px 4px rgba(2,6,23,.06);
   }
   @media (prefers-color-scheme: dark){
-    :root{
-      --bg:#0b1220; --ink:#e5e7eb;
-      --shadow:0 16px 28px rgba(0,0,0,.35), 0 6px 12px rgba(0,0,0,.25);
-    }
+    :root{ --bg:#0b1220; --ink:#e5e7eb; --shadow:0 16px 28px rgba(0,0,0,.35),0 6px 12px rgba(0,0,0,.25); }
   }
   *{box-sizing:border-box}
   body{
     margin:0; background:var(--bg); color:var(--ink);
     font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans","Apple Color Emoji","Segoe UI Emoji";
   }
-
-  /* utilidades de accesibilidad */
-  .sr-only{
-    position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden;
-    clip:rect(0,0,0,0); white-space:nowrap; border:0;
-  }
-
-  /* Cabecera */
+  /* Banner: mismo look & feel que el de la página */
   .header{
     background:linear-gradient(135deg,var(--brand),var(--brand-2));
-    color:#fff; padding:56px 24px; border-radius:0 0 var(--radius) var(--radius);
+    color:#fff; padding:48px 24px; border-radius:0 0 var(--radius) var(--radius);
     box-shadow:var(--shadow);
   }
-  .header h1{ margin:0 auto; max-width:1200px; font-weight:800; letter-spacing:.2px }
-
-  /* Contenedor principal */
-  .container{ max-width:1200px; margin:24px auto; padding:0 16px }
-
-  /* Grid de tarjetas */
-  .grid{ display:grid; grid-template-columns:1fr; gap:16px }
-  @media (min-width:640px){ .grid{ grid-template-columns:repeat(2,minmax(0,1fr)) } }
-  @media (min-width:1024px){ .grid{ grid-template-columns:repeat(4,minmax(0,1fr)) } }
-
-  /* Tarjetas (no enlazadas por ahora) */
+  .header h1{ margin:0; font-weight:800; letter-spacing:.2px; }
+  /* Contenedor full width */
+  .container{ width:100%; margin:24px 0; padding:0 12px; }
+  /* Grid que se estira a todo el ancho: auto-fit */
+  .grid{
+    display:grid; gap:16px;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  }
+  /* Tarjetas */
   .card{
     min-height:180px; border-radius:var(--radius); padding:20px;
     display:flex; flex-direction:column; justify-content:flex-end;
@@ -59,75 +47,38 @@
   .card p { margin:0; opacity:.92; font-size:14px }
   .card:hover{ transform:translateY(-4px); box-shadow:0 16px 30px rgba(2,6,23,.12),0 6px 10px rgba(2,6,23,.08) }
   .card:focus-visible{ outline:3px solid #93c5fd; outline-offset:3px }
-
-  .card--1{ background:var(--c1) }
-  .card--2{ background:var(--c2) }
-  .card--3{ background:var(--c3) }
-  .card--4{ background:var(--c4) }
-
-  /* Pie */
-  .footer{ max-width:1200px; margin:8px auto 32px; padding:0 16px; color:#64748b; font-size:12px }
+  .card--1{ background:var(--c1) } .card--2{ background:var(--c2) }
+  .card--3{ background:var(--c3) } .card--4{ background:var(--c4) }
+  .footer{ color:#64748b; font-size:12px; padding:8px 12px 24px }
 </style>
 </head>
 <body>
   <header class="header">
-    <h1>Sistema de Alerta Temprana</h1>
+    <h1>Unidades que conforman el Sistema de Alerta Temprana</h1>
   </header>
 
   <main class="container" aria-labelledby="titulo-modulos">
-    <h2 id="titulo-modulos" class="sr-only">Módulos del Sistema</h2>
-
+    <h2 id="titulo-modulos" style="position:absolute;left:-9999px">Módulos del Sistema</h2>
     <section class="grid" aria-label="Módulos del Sistema de Alerta Temprana">
-      <!-- Módulo 1 (ejemplo SIN enlace activo) -->
       <article class="card card--1" tabindex="0">
         <h2>Unidades de Alerta Temprana</h2>
         <p>Recepción, procesamiento y difusión de información crítica.</p>
       </article>
-      <!-- Ejemplo para ACTIVAR (reemplazar el <article> por esto):
-      <a class="card card--1" href="https://tu-dominio/uat.html">
-        <h2>Unidades de Alerta Temprana</h2>
-        <p>Recepción, procesamiento y difusión de información crítica.</p>
-      </a>
-      -->
-
-      <!-- Módulo 2 -->
       <article class="card card--2" tabindex="0">
         <h2>Organismos Técnicos de Monitoreo</h2>
         <p>Vigilancia continua y entrega de datos especializados.</p>
       </article>
-      <!-- Para ACTIVAR enlace a tu botonera de AMENAZA:
-      <a class="card card--2" href="https://fransenapred.github.io/site/otm_amenaza.html" target="_blank" rel="noopener">
-        <h2>Organismos Técnicos de Monitoreo</h2>
-        <p>Vigilancia continua y entrega de datos especializados.</p>
-      </a>
-      -->
-
-      <!-- Módulo 3 -->
       <article class="card card--3" tabindex="0">
         <h2>Sistema Nacional de Comunicaciones</h2>
         <p>Flujo bidireccional de información entre los actores.</p>
       </article>
-      <!-- Ejemplo ACTIVAR:
-      <a class="card card--3" href="https://tu-dominio/snc.html">
-        <h2>Sistema Nacional de Comunicaciones</h2>
-        <p>Flujo bidireccional de información entre los actores.</p>
-      </a>
-      -->
-
-      <!-- Módulo 4 -->
       <article class="card card--4" tabindex="0">
         <h2>Perímetro de Seguridad</h2>
         <p>Medidas físicas y digitales para proteger la infraestructura crítica.</p>
       </article>
-      <!-- Para ACTIVAR enlace a tu botonera de SECTORIAL:
-      <a class="card card--4" href="https://fransenapred.github.io/site/otm_sectorial.html" target="_blank" rel="noopener">
-        <h2>Perímetro de Seguridad</h2>
-        <p>Medidas físicas y digitales para proteger la infraestructura crítica.</p>
-      </a>
-      -->
     </section>
   </main>
 
-  <footer class="footer">© SENAPRED — prototipo UI</footer>
+  <div class="footer">© SENAPRED — prototipo UI</div>
 </body>
 </html>
