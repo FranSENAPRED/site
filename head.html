@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Unidades SAT</title>
+<title>Unidades SAT (top aligned)</title>
 <meta name="color-scheme" content="light dark">
 <style>
   :root{
-    --bg:#ffffff; --ink:#111827;                /* fondo blanco */
-    --c1:#3b82f6; --c2:#2563eb; --c3:#1d4ed8; --c4:#111827; /* colores tarjetas */
+    --bg:#ffffff; --ink:#111827;
+    --c1:#3b82f6; --c2:#2563eb; --c3:#1d4ed8; --c4:#111827;
     --radius:16px;
     --shadow:0 10px 20px rgba(2,6,23,.08), 0 2px 4px rgba(2,6,23,.06);
   }
@@ -18,30 +18,39 @@
     font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans","Apple Color Emoji","Segoe UI Emoji";
   }
 
-  /* Contenedor a todo el ancho con padding lateral */
   .container{ width:100%; padding:16px 12px 24px }
 
-  /* Grid full-width: se rellena de 1 a N columnas según espacio */
+  /* Grid que ocupa todo el ancho disponible */
   .grid{
     display:grid; gap:16px;
     grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    align-items:stretch; /* todas las tarjetas con la misma altura */
   }
 
-  /* Tarjetas */
+  /* Tarjetas alineadas ARRIBA */
   .card{
-    min-height:180px; border-radius:var(--radius); padding:20px;
-    display:flex; flex-direction:column; justify-content:flex-end;
-    color:#fff; box-shadow:var(--shadow);
+    min-height:180px;
+    border-radius:var(--radius);
+    padding:20px;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-start;  /* <- arriba */
+    align-items:flex-start;      /* <- izquierda */
+    gap:10px;                    /* espacio entre elementos */
+    color:#fff;
+    box-shadow:var(--shadow);
     transition:transform .12s ease, box-shadow .12s ease;
     outline:none; text-decoration:none; cursor:default;
   }
-  .card h2{ margin:0 0 6px 0; font-size:20px; font-weight:800; letter-spacing:.2px }
+  .card h2{ margin:0; font-size:20px; font-weight:800; letter-spacing:.2px }
   .card p { margin:0; opacity:.92; font-size:14px }
   .card:hover{ transform:translateY(-4px); box-shadow:0 16px 30px rgba(2,6,23,.12),0 6px 10px rgba(2,6,23,.08) }
   .card:focus-visible{ outline:3px solid #93c5fd; outline-offset:3px }
 
-  .card--1{ background:var(--c1) } .card--2{ background:var(--c2) }
-  .card--3{ background:var(--c3) } .card--4{ background:var(--c4) }
+  .card--1{ background:var(--c1) }
+  .card--2{ background:var(--c2) }
+  .card--3{ background:var(--c3) }
+  .card--4{ background:var(--c4) }
 </style>
 </head>
 <body>
@@ -52,17 +61,14 @@
         <h2>Unidades de Alerta Temprana</h2>
         <p>Recepción, procesamiento y difusión de información crítica.</p>
       </article>
-
       <article class="card card--2" tabindex="0">
         <h2>Organismos Técnicos de Monitoreo</h2>
         <p>Vigilancia continua y entrega de datos especializados.</p>
       </article>
-
       <article class="card card--3" tabindex="0">
         <h2>Sistema Nacional de Comunicaciones</h2>
         <p>Flujo bidireccional de información entre los actores.</p>
       </article>
-
       <article class="card card--4" tabindex="0">
         <h2>Perímetro de Seguridad</h2>
         <p>Medidas físicas y digitales para proteger la infraestructura crítica.</p>
