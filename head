@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Alerta Temprana</title>
+    <!-- Carga de Tailwind CSS para el diseño -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Aplicación de fuente Inter (moderna y limpia) */
+        :root {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Estilos base para la caja de cabecera */
+        .header-box {
+            background-color: #1e3a8a; /* Azul oscuro corporativo */
+            color: #ffffff;
+            padding: 2.5rem 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+        /* Estilos para las tarjetas de módulo */
+        .module-card {
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end; /* Alinear texto abajo */
+            padding: 1.5rem;
+            color: white;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: default; /* Indica que no es un enlace, es informativo */
+        }
+        /* Efecto de elevación al pasar el mouse */
+        .module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Colores específicos de los módulos */
+        .color-1 { background-color: #3b82f6; /* Azul Primario (más claro) */ }
+        .color-2 { background-color: #2563eb; /* Azul Secundario */ }
+        .color-3 { background-color: #1d4ed8; /* Azul Terciario */ }
+        .color-4 { background-color: #111827; /* Gris/Negro Oscuro */ }
+
+        /* Estilo para el contenedor de las tarjetas que usa Grid */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(1, minmax(0, 1fr)); /* 1 columna por defecto */
+            gap: 0; /* No hay separación entre módulos */
+        }
+
+        /* Media query para tabletas y escritorios (4 columnas) */
+        @media (min-width: 768px) {
+            .card-grid {
+                grid-template-columns: repeat(4, minmax(0, 1fr)); /* 4 columnas */
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 m-0 p-0">
+
+    <!-- 1. Cabecera (Titulo Principal) -->
+    <div class="header-box rounded-t-xl md:rounded-t-none">
+        <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-center">
+            Sistema de Alerta Temprana
+        </h1>
+    </div>
+
+    <!-- 2. Contenedor de Módulos (Grid de 4 columnas en desktop, 1 en móvil) -->
+    <div class="card-grid shadow-lg rounded-b-xl overflow-hidden md:rounded-b-none">
+
+        <!-- Módulo 1: Unidades de Alerta Temprana -->
+        <div class="module-card color-1">
+            <h2 class="text-xl md:text-2xl font-semibold mb-1">Unidades de Alerta Temprana</h2>
+            <p class="text-sm opacity-80">Encargados de la recepción, procesamiento y difusión de información crítica.</p>
+        </div>
+
+        <!-- Módulo 2: Organismos Técnicos Monitoreo -->
+        <div class="module-card color-2">
+            <h2 class="text-xl md:text-2xl font-semibold mb-1">Organismos Técnicos Monitoreo</h2>
+            <p class="text-sm opacity-80">Proporcionan datos especializados y realizan la vigilancia continua de amenazas.</p>
+        </div>
+
+        <!-- Módulo 3: Sistema Nacional de Comunicaciones -->
+        <div class="module-card color-3">
+            <h2 class="text-xl md:text-2xl font-semibold mb-1">Sistema Nacional de Comunicaciones</h2>
+            <p class="text-sm opacity-80">Garantiza el flujo bidireccional de información entre todos los actores.</p>
+        </div>
+
+        <!-- Módulo 4: Perímetro de Seguridad -->
+        <div class="module-card color-4">
+            <h2 class="text-xl md:text-2xl font-semibold mb-1">Perímetro de Seguridad</h2>
+            <p class="text-sm opacity-80">Conjunto de medidas físicas y digitales para proteger la infraestructura crítica.</p>
+        </div>
+
+    </div>
+
+</body>
+</html>
