@@ -1,97 +1,133 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Alerta Temprana</title>
-    <!-- Carga de Tailwind CSS para el diseño -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Aplicación de fuente Inter (moderna y limpia) */
-        :root {
-            font-family: 'Inter', sans-serif;
-        }
-        /* Estilos base para la caja de cabecera */
-        .header-box {
-            background-color: #1e3a8a; /* Azul oscuro corporativo */
-            color: #ffffff;
-            padding: 2.5rem 1rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-        }
-        /* Estilos para las tarjetas de módulo */
-        .module-card {
-            min-height: 200px;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end; /* Alinear texto abajo */
-            padding: 1.5rem;
-            color: white;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            cursor: default; /* Indica que no es un enlace, es informativo */
-        }
-        /* Efecto de elevación al pasar el mouse */
-        .module-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-        }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sistema de Alerta Temprana</title>
+<meta name="color-scheme" content="light dark">
+<style>
+  :root{
+    --bg:#f6f7fb; --ink:#111827;
+    --brand:#1e3a8a; --brand-2:#2f4ea3;
+    --c1:#3b82f6; --c2:#2563eb; --c3:#1d4ed8; --c4:#111827;
+    --radius:16px;
+    --shadow:0 10px 20px rgba(2,6,23,.08), 0 2px 4px rgba(2,6,23,.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0b1220; --ink:#e5e7eb;
+      --shadow:0 16px 28px rgba(0,0,0,.35), 0 6px 12px rgba(0,0,0,.25);
+    }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans","Apple Color Emoji","Segoe UI Emoji";
+  }
 
-        /* Colores específicos de los módulos */
-        .color-1 { background-color: #3b82f6; /* Azul Primario (más claro) */ }
-        .color-2 { background-color: #2563eb; /* Azul Secundario */ }
-        .color-3 { background-color: #1d4ed8; /* Azul Terciario */ }
-        .color-4 { background-color: #111827; /* Gris/Negro Oscuro */ }
+  /* utilidades de accesibilidad */
+  .sr-only{
+    position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden;
+    clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  }
 
-        /* Estilo para el contenedor de las tarjetas que usa Grid */
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(1, minmax(0, 1fr)); /* 1 columna por defecto */
-            gap: 0; /* No hay separación entre módulos */
-        }
+  /* Cabecera */
+  .header{
+    background:linear-gradient(135deg,var(--brand),var(--brand-2));
+    color:#fff; padding:56px 24px; border-radius:0 0 var(--radius) var(--radius);
+    box-shadow:var(--shadow);
+  }
+  .header h1{ margin:0 auto; max-width:1200px; font-weight:800; letter-spacing:.2px }
 
-        /* Media query para tabletas y escritorios (4 columnas) */
-        @media (min-width: 768px) {
-            .card-grid {
-                grid-template-columns: repeat(4, minmax(0, 1fr)); /* 4 columnas */
-            }
-        }
-    </style>
+  /* Contenedor principal */
+  .container{ max-width:1200px; margin:24px auto; padding:0 16px }
+
+  /* Grid de tarjetas */
+  .grid{ display:grid; grid-template-columns:1fr; gap:16px }
+  @media (min-width:640px){ .grid{ grid-template-columns:repeat(2,minmax(0,1fr)) } }
+  @media (min-width:1024px){ .grid{ grid-template-columns:repeat(4,minmax(0,1fr)) } }
+
+  /* Tarjetas (no enlazadas por ahora) */
+  .card{
+    min-height:180px; border-radius:var(--radius); padding:20px;
+    display:flex; flex-direction:column; justify-content:flex-end;
+    color:#fff; box-shadow:var(--shadow);
+    transition:transform .12s ease, box-shadow .12s ease;
+    outline:none; text-decoration:none; cursor:default;
+  }
+  .card h2{ margin:0 0 6px 0; font-size:20px; font-weight:800; letter-spacing:.2px }
+  .card p { margin:0; opacity:.92; font-size:14px }
+  .card:hover{ transform:translateY(-4px); box-shadow:0 16px 30px rgba(2,6,23,.12),0 6px 10px rgba(2,6,23,.08) }
+  .card:focus-visible{ outline:3px solid #93c5fd; outline-offset:3px }
+
+  .card--1{ background:var(--c1) }
+  .card--2{ background:var(--c2) }
+  .card--3{ background:var(--c3) }
+  .card--4{ background:var(--c4) }
+
+  /* Pie */
+  .footer{ max-width:1200px; margin:8px auto 32px; padding:0 16px; color:#64748b; font-size:12px }
+</style>
 </head>
-<body class="bg-gray-50 m-0 p-0">
+<body>
+  <header class="header">
+    <h1>Sistema de Alerta Temprana</h1>
+  </header>
 
-    <!-- 1. Cabecera (Titulo Principal) -->
-    <div class="header-box rounded-t-xl md:rounded-t-none">
-        <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-center">
-            Sistema de Alerta Temprana
-        </h1>
-    </div>
+  <main class="container" aria-labelledby="titulo-modulos">
+    <h2 id="titulo-modulos" class="sr-only">Módulos del Sistema</h2>
 
-    <!-- 2. Contenedor de Módulos (Grid de 4 columnas en desktop, 1 en móvil) -->
-    <div class="card-grid shadow-lg rounded-b-xl overflow-hidden md:rounded-b-none">
+    <section class="grid" aria-label="Módulos del Sistema de Alerta Temprana">
+      <!-- Módulo 1 (ejemplo SIN enlace activo) -->
+      <article class="card card--1" tabindex="0">
+        <h2>Unidades de Alerta Temprana</h2>
+        <p>Recepción, procesamiento y difusión de información crítica.</p>
+      </article>
+      <!-- Ejemplo para ACTIVAR (reemplazar el <article> por esto):
+      <a class="card card--1" href="https://tu-dominio/uat.html">
+        <h2>Unidades de Alerta Temprana</h2>
+        <p>Recepción, procesamiento y difusión de información crítica.</p>
+      </a>
+      -->
 
-        <!-- Módulo 1: Unidades de Alerta Temprana -->
-        <div class="module-card color-1">
-            <h2 class="text-xl md:text-2xl font-semibold mb-1">Unidades de Alerta Temprana</h2>
-            <p class="text-sm opacity-80">Encargados de la recepción, procesamiento y difusión de información crítica.</p>
-        </div>
+      <!-- Módulo 2 -->
+      <article class="card card--2" tabindex="0">
+        <h2>Organismos Técnicos de Monitoreo</h2>
+        <p>Vigilancia continua y entrega de datos especializados.</p>
+      </article>
+      <!-- Para ACTIVAR enlace a tu botonera de AMENAZA:
+      <a class="card card--2" href="https://fransenapred.github.io/site/otm_amenaza.html" target="_blank" rel="noopener">
+        <h2>Organismos Técnicos de Monitoreo</h2>
+        <p>Vigilancia continua y entrega de datos especializados.</p>
+      </a>
+      -->
 
-        <!-- Módulo 2: Organismos Técnicos Monitoreo -->
-        <div class="module-card color-2">
-            <h2 class="text-xl md:text-2xl font-semibold mb-1">Organismos Técnicos Monitoreo</h2>
-            <p class="text-sm opacity-80">Proporcionan datos especializados y realizan la vigilancia continua de amenazas.</p>
-        </div>
+      <!-- Módulo 3 -->
+      <article class="card card--3" tabindex="0">
+        <h2>Sistema Nacional de Comunicaciones</h2>
+        <p>Flujo bidireccional de información entre los actores.</p>
+      </article>
+      <!-- Ejemplo ACTIVAR:
+      <a class="card card--3" href="https://tu-dominio/snc.html">
+        <h2>Sistema Nacional de Comunicaciones</h2>
+        <p>Flujo bidireccional de información entre los actores.</p>
+      </a>
+      -->
 
-        <!-- Módulo 3: Sistema Nacional de Comunicaciones -->
-        <div class="module-card color-3">
-            <h2 class="text-xl md:text-2xl font-semibold mb-1">Sistema Nacional de Comunicaciones</h2>
-            <p class="text-sm opacity-80">Garantiza el flujo bidireccional de información entre todos los actores.</p>
-        </div>
+      <!-- Módulo 4 -->
+      <article class="card card--4" tabindex="0">
+        <h2>Perímetro de Seguridad</h2>
+        <p>Medidas físicas y digitales para proteger la infraestructura crítica.</p>
+      </article>
+      <!-- Para ACTIVAR enlace a tu botonera de SECTORIAL:
+      <a class="card card--4" href="https://fransenapred.github.io/site/otm_sectorial.html" target="_blank" rel="noopener">
+        <h2>Perímetro de Seguridad</h2>
+        <p>Medidas físicas y digitales para proteger la infraestructura crítica.</p>
+      </a>
+      -->
+    </section>
+  </main>
 
-        <!-- Módulo 4: Perímetro de Seguridad -->
-        <div class="module-card color-4">
-            <h2 class="text-xl md:text-2xl font-semibold mb-1">Perímetro de Seguridad</h2>
-            <p class="text-sm opacity-80">Conjunto de medidas físicas y digitales para proteger la infraestructura crítica.</p>
-        </div>
-
-    </div>
-
+  <footer class="footer">© SENAPRED — prototipo UI</footer>
 </body>
 </html>
