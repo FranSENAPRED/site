@@ -1,38 +1,48 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Botonera de Enlaces</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    .btn-gray-style{ background:#6b7280; color:#fff; }
-    .btn-style:hover{ box-shadow:0 4px 6px rgba(0,0,0,.1); transform:translateY(-2px); }
-    .btn-grid{
-      display:grid;
-      grid-template-columns: 1fr 1fr; /* <- dos columnas SIEMPRE */
-      gap:12px; padding:16px; max-width:900px; margin:0 auto;
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OTM de la Amenaza</title>
+<style>
+  :root{
+    --btn-bg:#4B5563;        /* gris 600 */
+    --btn-text:#ffffff;
+    --btn-bg-hover:#374151;  /* gris 700 */
+    --focus:#93c5fd;         /* anillo de foco accesible */
+    --gap:12px; --radius:12px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#fff;color:#0f172a;font-family:Segoe UI,Arial,Helvetica,sans-serif}
+  .wrap{max-width:900px;margin:0 auto;padding:16px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
+  .btn{
+    display:block;text-decoration:none;text-align:center;
+    background:var(--btn-bg);color:var(--btn-text);
+    padding:12px;border-radius:var(--radius);
+    font-weight:700;line-height:1.2;
+    transition:background .15s ease, transform .05s ease;
+  }
+  .btn:hover{background:var(--btn-bg-hover);transform:translateY(-2px)}
+  .btn:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+</style>
 </head>
-<body class="bg-white">
-  <div class="btn-grid">
-    <a href="https://www.meteochile.gob.cl/"  target="_blank" rel="noopener" class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition">DMC</a>
-    <a href="https://www.shoa.cl/"            target="_blank" rel="noopener" class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition">SHOA</a>
-
-    <a href="https://www.sernageomin.cl/"     target="_blank" rel="noopener" class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition">SERNAGEOMIN</a>
-    <a href="https://www.conaf.cl/"           target="_blank" rel="noopener" class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition">CONAF</a>
-
-    <a href="https://www.sismologia.cl/"      target="_blank" rel="noopener" class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition">CSN</a>
-    <a href="https://dga.mop.gob.cl/"         target="_blank" rel="noopener" class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition">DGA</a>
-
-    <a href="http://www.servimet.cl/"         target="_blank" rel="noopener" class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition">SERVIMET</a>
-    <a href="https://www.cchen.cl/"           target="_blank" rel="noopener" class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition">CCHEN</a>
-
-    <a href="https://www.sag.gob.cl/"         target="_blank" rel="noopener" class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition">SAG</a>
-    <a href="https://www.minsal.cl/"          target="_blank" rel="noopener" class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition">MINSAL</a>
-
-    <a href="https://www.bomberos.cl/"        target="_blank" rel="noopener" class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition">Bomberos de Chile</a>
-    <a href="https://www.doh.gob.cl/"         target="_blank" rel="noopener" class="btn-style btn-gray-style rounded-lg text-center font-bold p-3 transition">DOH</a>
+<body>
+  <div class="wrap">
+    <div class="grid" aria-label="OTM de la Amenaza">
+      <a class="btn" href="https://www.meteochile.gob.cl/"  target="_blank" rel="noopener">DMC</a>
+      <a class="btn" href="https://www.shoa.cl/"            target="_blank" rel="noopener">SHOA</a>
+      <a class="btn" href="https://www.sernageomin.cl/"     target="_blank" rel="noopener">SERNAGEOMIN</a>
+      <a class="btn" href="https://www.conaf.cl/"           target="_blank" rel="noopener">CONAF</a>
+      <a class="btn" href="https://www.sismologia.cl/"      target="_blank" rel="noopener">CSN</a>
+      <a class="btn" href="https://dga.mop.gob.cl/"         target="_blank" rel="noopener">DGA</a>
+      <a class="btn" href="http://www.servimet.cl/"         target="_blank" rel="noopener">SERVIMET</a>
+      <a class="btn" href="https://www.cchen.cl/"           target="_blank" rel="noopener">CCHEN</a>
+      <a class="btn" href="https://www.sag.gob.cl/"         target="_blank" rel="noopener">SAG</a>
+      <a class="btn" href="https://www.minsal.cl/"          target="_blank" rel="noopener">MINSAL</a>
+      <a class="btn" href="https://www.bomberos.cl/"        target="_blank" rel="noopener">Bomberos de Chile</a>
+      <a class="btn" href="https://www.doh.gob.cl/"         target="_blank" rel="noopener">DOH</a>
+    </div>
   </div>
 </body>
 </html>
