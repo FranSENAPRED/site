@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planificación Mensual de Pruebas de Enlaces</title>
+    <!-- Carga de Tailwind CSS para un diseño profesional y responsive -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Configuración personalizada de Tailwind */
+        :root {
+            --color-primary: #1e40af; /* Tailwind Blue 800 (Fuerte) */
+            --color-secondary: #f3f4f6; /* Tailwind Gray 100 (Cabeceras Días) */
+            --color-background: #f9fafb; /* Fondo General */
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--color-background);
+        }
+        .planning-grid-wrapper {
+            /* Contenedor que maneja el desplazamiento horizontal */
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .planning-table {
+            border-collapse: separate; /* Necesario para bordes y sticky column */
+            border-spacing: 0;
+            min-width: 100%;
+        }
+        .header-cell {
+            min-width: 40px; /* Ancho fijo para las celdas de día */
+            font-size: 0.75rem;
+            height: 40px; /* Altura uniforme */
+            padding: 0;
+            line-height: 40px;
+        }
+        /* Sticky Column Styles */
+        .sticky-region-col {
+            position: sticky;
+            left: 0;
+            z-index: 20;
+            min-width: 250px;
+            text-align: left;
+            padding-left: 1rem;
+            padding-right: 0.5rem;
+            font-weight: 500;
+            background-color: inherit; /* Hereda el color de la fila para zebra-striping */
+            border-right: 1px solid #e5e7eb; /* Gray 200 */
+        }
+        /* Sticky Corners (Top-Left) */
+        .sticky-corner-header {
+            position: sticky;
+            left: 0;
+            top: 0;
+            z-index: 30; /* Más alto que el resto de headers */
+            background-color: var(--color-secondary);
+            border-right: 1px solid #d1d5db;
+        }
+        .sticky-corner-days {
+            position: sticky;
+            left: 0;
+            top: 40px; /* Debajo de la cabecera de días */
+            z-index: 30;
+            background-color: #f3f4f6; /* Gray 100 */
+            border-right: 1px solid #d1d5db;
+        }
+        /* Grupo Header Sticky */
+        .group-header-row .sticky-region-col {
+            background-color: #d1d5db !important; /* Gris oscuro para las cabeceras */
+            font-weight: bold;
+            text-transform: uppercase;
+            z-index: 20;
+        }
+        /* Estilo para el día de planificación (Bloque azul oscuro) */
+        .marked-day {
+            background-color: var(--color-primary);
+            cursor: pointer;
+            transition: background-color 0.1s ease;
+        }
+        .marked-day:hover {
+            background-color: #1d4ed8; /* Blue 700 al pasar el ratón */
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none; /* Oculto por defecto */
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 0.5rem;
+            max-width: 90%;
+            min-width: 350px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.3s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+
+    <div class="max-w-7xl mx-auto bg-white shadow-xl rounded-xl border border-gray-200">
+        <!-- Título y Navegación del Calendario -->
+        <div class="p-6 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-center bg-gray-50 rounded-t-xl">
+            <h1 class="text-2xl font-extrabold text-gray-800 mb-4 sm:mb-0">
+                Planificación Mensual de Pruebas <span class="text-blue-700 hidden sm:inline">de Enlaces Satelitales</span>
+            </h1>
+            <div id="month-navigation" class="flex items-center space-x-4">
+                <button onclick="changeMonth(-1)" class="p-2 rounded-full bg-blue-100 text-blue-800 hover:bg-blue-200 transition duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50" title="Mes Anterior">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <h2 id="current-month-year" class="text-xl font-bold text-gray-700 min-w-[150px] text-center"></h2>
+                <button onclick="changeMonth(1)" class="p-2 rounded-full bg-blue-100 text-blue-800 hover:bg-blue-200 transition duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50" title="Mes Siguiente">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Contenedor principal de la matriz de planificación con scroll -->
+        <div class="planning-grid-wrapper">
+            <table class="planning-table w-full">
+                <!-- Cuerpo de la tabla (Se llenará con JavaScript) -->
+                <tbody id="planning-body">
+                    <!-- Filas de cabecera de días y datos de planificación irán aquí -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Leyenda / Observaciones -->
+        <div class="p-6 bg-gray-50 border-t border-gray-200 rounded-b-xl">
+            <h3 class="text-sm font-semibold text-gray-600 mb-2">Observaciones:</h3>
+            <p class="text-xs text-gray-500">
+                La fecha marcada en azul oscuro ($\blacksquare$) indica un día de prueba de enlaces satelitales programado para la región o autoridad correspondiente.
+            </p>
+            <p class="text-xs text-red-500 mt-2">
+                *Datos de Octubre, Noviembre y Diciembre 2025 son de ejemplo (mockup) basados en el patrón de Septiembre.
+            </p>
+        </div>
+    </div>
+
+    <!-- Modal para mostrar detalles del evento (Reemplaza a la notificación/alert) -->
+    <div id="event-modal-overlay" class="modal-overlay" onclick="closeModal()">
+        <div id="event-modal-content" class="modal-content" onclick="event.stopPropagation()">
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 id="modal-title" class="text-xl font-bold text-blue-800">Detalle de Planificación</h3>
+                    <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 transition">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                <div class="space-y-3 text-gray-700">
+                    <p><strong>Entidad:</strong> <span id="modal-region"></span></p>
+                    <p><strong>Fecha:</strong> <span id="modal-date"></span></p>
+                    <p class="text-sm italic mt-4 border-t pt-3">
+                        Integración Sharepoint: En una implementación real, este espacio mostraría datos en tiempo real (ej. link al documento PO-MAC-06, estado de la prueba, responsable, etc.) obtenidos vía API.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script de JavaScript para la lógica del calendario -->
+    <script>
+        // --- 1. CONFIGURACIÓN DE DATOS (Mismos datos del documento adjunto + Mockup de Oct-Dic 2025) ---
+        const MONTH_NAMES = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        // Meses de planificación (Septiembre a Diciembre 2025)
+        const START_MONTH = 8; 
+        const END_MONTH = 11; 
+
+        // Estructura de datos: { [Nombre Entidad]: { [Índice Mes 0-11]: [Día 1, Día 2, ...] } }
+        const planningData = {
+            'Arica y Parinacota': { 8: [10, 27], 9: [11, 28], 10: [12, 29], 11: [13, 30] },
+            'Tarapacá': { 8: [11, 28], 9: [12, 29], 10: [13, 30], 11: [1, 14] },
+            'Antofagasta': { 8: [12, 29], 9: [13, 30], 10: [1, 14], 11: [2, 15] },
+            'Atacama': { 8: [13, 30], 9: [1, 14], 10: [2, 15], 11: [3, 16] },
+            'Coquimbo': { 8: [1, 14, 25], 9: [2, 15, 26], 10: [3, 16, 27], 11: [4, 17, 28] },
+            'Valparaíso': { 8: [2, 15, 26], 9: [3, 16, 27], 10: [4, 17, 28], 11: [5, 18, 29] },
+            'Metropolitana': { 8: [3, 16, 27], 9: [4, 17, 28], 10: [5, 18, 29], 11: [6, 19, 30] },
+            "O'Higgins": { 8: [4, 17, 28], 9: [5, 18, 29], 10: [6, 19, 30], 11: [7, 20, 1] },
+            'Maule': { 8: [5, 18, 29], 9: [6, 19, 30], 10: [7, 20, 1], 11: [8, 21, 2] },
+            'Ñuble': { 8: [6, 19, 30], 9: [7, 20, 1], 10: [8, 21, 2], 11: [9, 22, 3] },
+            'Biobío': { 8: [7, 20, 25], 9: [8, 21, 26], 10: [9, 22, 27], 11: [10, 23, 28] },
+            'La Araucanía': { 8: [8, 21, 26], 9: [9, 22, 27], 10: [10, 23, 28], 11: [11, 24, 29] },
+            'Los Ríos': { 8: [9, 22, 27], 9: [10, 23, 28], 10: [11, 24, 29], 11: [12, 25, 30] },
+            'Los Lagos': { 8: [1, 23, 28], 9: [2, 24, 29], 10: [3, 25, 30], 11: [4, 26, 1] },
+            'Aysén': { 8: [2, 24, 29], 9: [3, 25, 30], 10: [4, 26, 1], 11: [5, 27, 2] },
+            'Magallanes': { 8: [3, 10, 30], 9: [4, 11, 1], 10: [5, 12, 2], 11: [6, 13, 3] },
+            
+            'Isla de Pascua - Rapa Nui': { 8: [1, 9, 26], 9: [2, 10, 27], 10: [3, 11, 28], 11: [4, 12, 29] },
+            'Juan Fernández': { 8: [2, 10, 27], 9: [3, 11, 28], 10: [4, 12, 29], 11: [5, 13, 30] },
+
+            'Director Nacional': { 8: [10, 20, 30], 9: [11, 21, 1], 10: [12, 22, 2], 11: [13, 23, 3] },
+            'Jefe Depto Alerta T.': { 8: [11, 21, 29], 9: [12, 22, 30], 10: [13, 23, 1], 11: [1, 24, 2] },
+        };
+
+        const regions = [
+            { name: 'UNIDADES REGIONALES', type: 'header', subtitle: 'Sat./PTT Iridium, BGAN y Regional - Int. Satelital' },
+            { name: 'Arica y Parinacota', type: 'region' },
+            { name: 'Tarapacá', type: 'region' },
+            { name: 'Antofagasta', type: 'region' },
+            { name: 'Atacama', type: 'region' },
+            { name: 'Coquimbo', type: 'region' },
+            { name: 'Valparaíso', type: 'region' },
+            { name: 'Metropolitana', type: 'region' },
+            { name: "O'Higgins", type: 'region' },
+            { name: 'Maule', type: 'region' },
+            { name: 'Ñuble', type: 'region' },
+            { name: 'Biobío', type: 'region' },
+            { name: 'La Araucanía', type: 'region' },
+            { name: 'Los Ríos', type: 'region' },
+            { name: 'Los Lagos', type: 'region' },
+            { name: 'Aysén', type: 'region' },
+            { name: 'Magallanes', type: 'region' },
+            
+            { name: 'TERRITORIO INSULAR con NIVEL CENTRAL', type: 'header', subtitle: 'Isla de Pascua y Archipiélago Juan Fernández' },
+            { name: 'Isla de Pascua - Rapa Nui', type: 'insular' },
+            { name: 'Juan Fernández', type: 'insular' },
+
+            { name: 'AUTORIDADES SENAPRED', type: 'header', subtitle: 'Director Nacional - Jefe Depto. Alerta Temprana' },
+            { name: 'Director Nacional', type: 'authority' },
+            { name: 'Jefe Depto Alerta T.', type: 'authority' },
+        ];
+
+        // --- 2. LÓGICA DEL CALENDARIO Y MODAL ---
+        let currentMonth = 8; // Septiembre (0-indexed)
+        let currentYear = 2025;
+
+        /**
+         * Obtiene el número de días del mes.
+         */
+        function getDaysInMonth(year, month) {
+            return new Date(year, month + 1, 0).getDate();
+        }
+
+        /**
+         * Obtiene el día de la semana para el primer día del mes (1=Lunes).
+         */
+        function getFirstDayOfMonth(year, month) {
+            let day = new Date(year, month, 1).getDay();
+            return day === 0 ? 7 : day;
+        }
+
+        /**
+         * Muestra el modal con los detalles del evento.
+         */
+        function showModal(region, day) {
+            const dateStr = `${day} de ${MONTH_NAMES[currentMonth]} de ${currentYear}`;
+            
+            document.getElementById('modal-region').textContent = region;
+            document.getElementById('modal-date').textContent = dateStr;
+            document.getElementById('event-modal-overlay').style.display = 'flex';
+        }
+
+        /**
+         * Oculta el modal.
+         */
+        function closeModal() {
+            document.getElementById('event-modal-overlay').style.display = 'none';
+        }
+
+        /**
+         * Renderiza la matriz de planificación.
+         */
+        function renderPlanningGrid() {
+            const daysInMonth = getDaysInMonth(currentYear, currentMonth);
+            const firstDay = getFirstDayOfMonth(currentYear, currentMonth); 
+            const planningBody = document.getElementById('planning-body');
+            planningBody.innerHTML = ''; 
+
+            // 1. Actualizar título de navegación
+            document.getElementById('current-month-year').textContent = `${MONTH_NAMES[currentMonth]} ${currentYear}`;
+
+            // 2. Fila de Días de la semana (Lu, Ma, Mi, Ju, Vi, Sá, Do)
+            let dayOfWeekRow = `
+                <tr class="bg-gray-200 border-b border-gray-300">
+                    <th class="py-2 px-2 text-left font-bold text-sm text-gray-700 uppercase sticky-region-col sticky-corner-header border-b border-gray-400">
+                        Entidad / Día
+                    </th>
+            `;
+            const dayLabels = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá', 'Do'];
+            
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayIndex = (firstDay + i - 2) % 7; 
+                const dayLabel = dayLabels[dayIndex < 0 ? dayIndex + 7 : dayIndex];
+                const isWeekend = dayLabel === 'Sá' || dayLabel === 'Do';
+
+                dayOfWeekRow += `
+                    <th class="header-cell border-r border-gray-300 sticky top-0 z-10 
+                        ${isWeekend ? 'bg-red-300 text-red-800' : 'bg-blue-300 text-blue-800'}">
+                        ${dayLabel}
+                    </th>
+                `;
+            }
+            dayOfWeekRow += '</tr>';
+            planningBody.innerHTML += dayOfWeekRow;
+
+
+            // 3. Fila de Números de Día (1, 2, 3, ...)
+            let dayNumberRow = `
+                <tr class="bg-gray-100 border-b-2 border-blue-600">
+                    <th class="py-2 px-2 text-left font-bold text-sm text-gray-700 sticky-region-col sticky-corner-days border-b-2 border-blue-600">
+                        <!-- Celda de esquina vacía -->
+                    </th>
+            `;
+            for (let i = 1; i <= daysInMonth; i++) {
+                dayNumberRow += `
+                    <th class="header-cell border-r border-gray-300 text-gray-900 font-bold sticky top-[40px] z-10 bg-gray-100">
+                        ${i}
+                    </th>
+                `;
+            }
+            dayNumberRow += '</tr>';
+            planningBody.innerHTML += dayNumberRow;
+
+            // 4. Filas de Datos de Regiones
+            regions.forEach((item, index) => {
+                const isEvenRow = index % 2 === 0;
+                const rowBg = isEvenRow ? 'bg-white' : 'bg-gray-50'; // Zebra-striping
+                const regionData = planningData[item.name] || {};
+                const scheduledDays = regionData[currentMonth] || [];
+
+                if (item.type === 'header') {
+                    // Fila de encabezado de grupo
+                    planningBody.innerHTML += `
+                        <tr class="group-header-row border-t border-gray-400">
+                            <td class="group-header py-2 px-4 text-gray-800 sticky-region-col bg-gray-300 border-r border-gray-400">
+                                ${item.name}
+                                <span class="text-xs font-normal ml-2 text-gray-600">(${item.subtitle})</span>
+                            </td>
+                            <td colspan="${daysInMonth}" class="group-header py-2 px-4 bg-gray-300 border border-gray-300 border-t-0 border-b-0">
+                                <!-- Columna de relleno para el resto del ancho -->
+                            </td>
+                        </tr>
+                    `;
+                } else {
+                    // Fila de datos de la región
+                    let regionRow = `
+                        <tr class="border-b border-gray-200 hover:bg-blue-100 transition duration-100 ${rowBg}">
+                            <td class="py-3 text-sm text-gray-800 sticky-region-col ${rowBg}">
+                                ${item.name}
+                            </td>
+                    `;
+                    
+                    for (let i = 1; i <= daysInMonth; i++) {
+                        const isScheduled = scheduledDays.includes(i);
+                        const cellClasses = isScheduled
+                            ? 'marked-day'
+                            : '';
+
+                        regionRow += `
+                            <td class="header-cell border-r border-gray-300 ${cellClasses}"
+                                ${isScheduled ? `title="Click para ver detalles de la prueba" onclick="showModal('${item.name}', ${i})"` : ''}
+                            >
+                                <!-- Celda vacía con solo color -->
+                            </td>
+                        `;
+                    }
+                    regionRow += '</tr>';
+                    planningBody.innerHTML += regionRow;
+                }
+            });
+            
+            // Habilitar/Deshabilitar botones de navegación
+            document.querySelector('#month-navigation button:first-child').disabled = currentMonth <= START_MONTH;
+            document.querySelector('#month-navigation button:last-child').disabled = currentMonth >= END_MONTH;
+        }
+
+        /**
+         * Cambia el mes actual y vuelve a renderizar.
+         */
+        function changeMonth(delta) {
+            let newMonth = currentMonth + delta;
+            
+            if (newMonth >= START_MONTH && newMonth <= END_MONTH) {
+                currentMonth = newMonth;
+                renderPlanningGrid();
+            }
+        }
+
+        // Inicializar el calendario al cargar la página
+        window.onload = () => {
+            renderPlanningGrid();
+        };
+        
+        // Cierre de modal si se pulsa ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && document.getElementById('event-modal-overlay').style.display === 'flex') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
