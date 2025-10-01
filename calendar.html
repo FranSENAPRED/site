@@ -195,10 +195,10 @@
         <div id="calendar-footer" class="p-4 bg-gray-50 border-t border-gray-200 rounded-b-xl no-print">
             <h3 class="text-xs font-semibold text-gray-600 mb-1">Observaciones:</h3>
             <p class="text-[0.65rem] text-gray-500">
-                La fecha marcada en azul oscuro ($\blacksquare$) indica un día de prueba de enlaces satelitales programado para la región o autoridad correspondiente. Los fines de semana están marcados en color secundario (rojo/coral).
+                La fecha marcada en azul oscuro indica un día de prueba de enlaces satelitales programado para la región o autoridad correspondiente.
             </p>
             <p class="text-[0.65rem] text-red-500 mt-1">
-                *Los datos de planificación se gestionan manualmente en el código JavaScript.
+                *Servicio Nacional de Prevención y Respuesta ante Desastres (SENAPRED).
             </p>
         </div>
     </div>
@@ -217,7 +217,7 @@
                     <p><strong>Entidad:</strong> <span id="modal-region"></span></p>
                     <p><strong>Fecha:</strong> <span id="modal-date"></span></p>
                     <p class="text-sm italic mt-4 border-t pt-3">
-                        UTA.
+                        Unidad de Alerta Temprana (SENAPRED).
                     </p>
                 </div>
             </div>
@@ -314,7 +314,7 @@
 
         const regions = [
             // Subtítulo inyectado en la misma celda de la cabecera del grupo
-            { name: 'UNIDADES REGIONALES', type: 'header', subtitle: '(Sat./PTT Iridium, BGAN y Regional - Int. Satelital)' },
+            { name: 'UNIDADES REGIONALES', type: 'header', subtitle: '(Sat./PTT Iridium, Delegado Presidencial/Director Regional, Iridium y BGAN Unidad Regional - Int. Satelital)' },
             { name: 'Arica y Parinacota', type: 'region' },
             { name: 'Tarapacá', type: 'region' },
             { name: 'Antofagasta', type: 'region' },
@@ -336,7 +336,7 @@
             { name: 'Isla de Pascua - Rapa Nui', type: 'insular' },
             { name: 'Juan Fernández', type: 'insular' },
 
-            { name: 'AUTORIDADES SENAPRED', type: 'header', subtitle: '(Director Nacional - Jefe Depto. Alerta Temprana)' },
+            { name: 'AUTORIDADES SENAPRED', type: 'header', subtitle: '(Director(a) Nacional - Jefe Depto. Alerta Temprana)' },
             { name: 'Director Nacional', type: 'authority' },
             { name: 'Jefe Depto Alerta T.', type: 'authority' },
         ];
