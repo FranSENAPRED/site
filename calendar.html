@@ -74,16 +74,42 @@
             background-color: #d1d5db; /* Gris más claro que el secundario para contraste */
             border-right: 1px solid #d1d5db;
         }
-        /* Grupo Header Sticky */
+        
+        /* Fila del Título de Grupo (UNIDADES REGIONALES) */
+        .group-header-row {
+            /* Separación visual superior */
+            border-top: 2px solid #999999;
+        }
+
+        /* Celda de Título de Grupo (columna izquierda) */
         .group-header-row .sticky-region-col {
             background-color: #d1d5db !important; /* Gris claro de Tailwind */
             font-weight: bold;
             text-transform: uppercase;
             z-index: 20;
-            font-size: 0.875rem; 
-            white-space: normal; 
+            font-size: 0.875rem; /* text-sm for group titles */
             line-height: 1.1; 
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+            white-space: nowrap;
+            vertical-align: middle;
         }
+        
+        /* Celda del Subtítulo Descriptivo (ocupa el espacio de los días) */
+        .group-header-subtitle-cell {
+            background-color: #e5e7eb; /* Gris ligeramente más claro que el título del grupo */
+            font-weight: bold;
+            font-size: 0.75rem; /* text-xs */
+            color: #1f2937; /* text-gray-900 */
+            text-align: center; /* <<< CENTRADO APLICADO AQUÍ >>> */
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+
         /* Estilo para el día de planificación (Bloque azul oscuro) */
         .marked-day {
             background-color: var(--color-primary);
@@ -103,6 +129,25 @@
         .weekend-bg {
             background-color: var(--color-weekend); 
             color: white;
+        }
+
+        /* Estilos de impresión */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                background-color: white !important;
+            }
+            .main-container {
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+            }
+            .planning-grid-wrapper {
+                /* Asegura que la tabla no se corte horizontalmente, puede depender de la configuración de la impresora */
+                overflow-x: visible !important;
+            }
         }
 
         /* Modal Styles - Mantener el tamaño para buena UX */
@@ -136,21 +181,36 @@
 
     <div class="main-container mx-auto bg-white shadow-xl rounded-xl border border-gray-200">
         <!-- Título y Navegación del Calendario -->
-        <div class="p-4 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-center bg-gray-50 rounded-t-xl">
+        <div id="calendar-header" class="p-4 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-center bg-gray-50 rounded-t-xl no-print">
             <!-- Reducido el tamaño del título principal -->
             <h1 class="text-xl font-extrabold text-gray-800 mb-2 sm:mb-0">
                 Planificación Mensual <span class="text-blue-700 hidden sm:inline">de Pruebas</span>
             </h1>
-            <div id="month-navigation" class="flex items-center space-x-4">
-                <button onclick="changeMonth(-1)" class="p-1 rounded-full bg-blue-100 text-blue-800 hover:bg-blue-200 transition duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50" title="Mes Anterior">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            <div class="flex items-center space-x-4">
+                 <!-- Botón Imprimir/PDF -->
+                <button onclick="printCalendar()" class="p-2 rounded-lg bg-gray-300 text-gray-800 hover:bg-gray-400 transition duration-150 focus:outline-none focus:ring-2 focus:ring-gray-500 text-xs font-semibold" title="Imprimir o Guardar como PDF">
+                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m0 4h10m0-4v4m-4-8h.01M5 11h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2z"></path></svg>
+                    Imprimir / PDF
                 </button>
-                <!-- Reducido el tamaño del mes/año -->
-                <h2 id="current-month-year" class="text-lg font-bold text-gray-700 min-w-[120px] text-center"></h2>
-                <button onclick="changeMonth(1)" class="p-1 rounded-full bg-blue-100 text-blue-800 hover:bg-blue-200 transition duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50" title="Mes Siguiente">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                </button>
+                <div id="month-navigation" class="flex items-center space-x-4">
+                    <button onclick="changeMonth(-1)" class="p-1 rounded-full bg-blue-100 text-blue-800 hover:bg-blue-200 transition duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50" title="Mes Anterior">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    </button>
+                    <!-- Reducido el tamaño del mes/año -->
+                    <h2 id="current-month-year" class="text-lg font-bold text-gray-700 min-w-[120px] text-center"></h2>
+                    <button onclick="changeMonth(1)" class="p-1 rounded-full bg-blue-100 text-blue-800 hover:bg-blue-200 transition duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50" title="Mes Siguiente">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                </div>
             </div>
+        </div>
+        
+        <!-- Título para la impresión (oculto en pantalla, visible en impresión) -->
+        <div id="print-title" class="hidden print-title-style">
+            <h1 class="text-xl font-extrabold text-gray-800 p-4 text-center">
+                Planificación Mensual de Pruebas de Enlaces Satelitales
+            </h1>
+            <h2 id="print-month-year" class="text-lg font-bold text-gray-700 p-2 text-center"></h2>
         </div>
 
         <!-- Contenedor principal de la matriz de planificación con scroll -->
@@ -164,16 +224,13 @@
         </div>
 
         <!-- Leyenda / Observaciones -->
-        <div class="p-4 bg-gray-50 border-t border-gray-200 rounded-b-xl">
+        <div id="calendar-footer" class="p-4 bg-gray-50 border-t border-gray-200 rounded-b-xl no-print">
             <h3 class="text-xs font-semibold text-gray-600 mb-1">Observaciones:</h3>
             <p class="text-[0.65rem] text-gray-500">
-                El calendario es de carácter referencial. 02 Pruebas de teléfonos satelitales Directores y 02 pruebas satelitales de los Delegados Presidenciales Regionales. 
-02 Pruebas de teléfonos satelitales de autoridades del nivel central (Director Nacional y Jefe Departamento del Sistema de Alerta Temprana).
-Pruebas de teléfonos satelitales de enlaces del territorio insular los miércoles.
-Este calendario es independiente de las pruebas satelitales que están planificadas con cada Unidad Regional (1 Iridium y 1 BGAN a la semana) y de las que puedan realizar con el sistema Starlink.
+                La fecha marcada en azul oscuro ($\blacksquare$) indica un día de prueba de enlaces satelitales programado para la región o autoridad correspondiente. Los fines de semana están marcados en color secundario (rojo/coral).
             </p>
             <p class="text-[0.65rem] text-red-500 mt-1">
-                *Datos de Octubre, Noviembre y Diciembre 2025.
+                *Datos de 2025 y 2026 son de ejemplo (mockup) basados en un patrón recurrente.
             </p>
         </div>
     </div>
@@ -201,41 +258,42 @@ Este calendario es independiente de las pruebas satelitales que están planifica
 
     <!-- Script de JavaScript para la lógica del calendario -->
     <script>
-        // --- 1. CONFIGURACIÓN DE DATOS (Mismos datos del documento adjunto + Mockup de Oct-Dic 2025) ---
+        // --- 1. CONFIGURACIÓN DE DATOS (Ampliación al 2026 y Mockup Recurrente) ---
         const MONTH_NAMES = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-        // Meses de planificación (Septiembre a Diciembre 2025)
+        
+        // Rango de Planificación: Septiembre 2025 (8) a Diciembre 2026 (11)
         const START_MONTH = 8; 
         const END_MONTH = 11; 
-        const YEAR = 2025; // El año de la planificación
+        const START_YEAR = 2025;
+        const END_YEAR = 2026; 
 
-        // Estructura de datos: { [Nombre Entidad]: { [Índice Mes 0-11]: [Día 1, Día 2, ...] } }
-        const planningData = {
-            'Arica y Parinacota': { 8: [11, 28], 9: [11, 28], 10: [12, 29], 11: [13, 30] },
-            'Tarapacá': { 8: [11, 28], 9: [12, 29], 10: [13, 30], 11: [1, 14] },
-            'Antofagasta': { 8: [12, 29], 9: [13, 30], 10: [1, 14], 11: [2, 15] },
-            'Atacama': { 8: [13, 30], 9: [1, 14], 10: [2, 15], 11: [3, 16] },
-            'Coquimbo': { 8: [1, 14, 25], 9: [2, 15, 26], 10: [3, 16, 27], 11: [4, 17, 28] },
-            'Valparaíso': { 8: [2, 15, 26], 9: [3, 16, 27], 10: [4, 17, 28], 11: [5, 18, 29] },
-            'Metropolitana': { 8: [3, 16, 27], 9: [4, 17, 28], 10: [5, 18, 29], 11: [6, 19, 30] },
-            "O'Higgins": { 8: [4, 17, 28], 9: [5, 18, 29], 10: [6, 19, 30], 11: [7, 20, 1] },
-            'Maule': { 8: [5, 18, 29], 9: [6, 19, 30], 10: [7, 20, 1], 11: [8, 21, 2] },
-            'Ñuble': { 8: [6, 19, 30], 9: [7, 20, 1], 10: [8, 21, 2], 11: [9, 22, 3] },
-            'Biobío': { 8: [7, 20, 25], 9: [8, 21, 26], 10: [9, 22, 27], 11: [10, 23, 28] },
-            'La Araucanía': { 8: [8, 21, 26], 9: [9, 22, 27], 10: [10, 23, 28], 11: [11, 24, 29] },
-            'Los Ríos': { 8: [9, 22, 27], 9: [10, 23, 28], 10: [11, 24, 29], 11: [12, 25, 30] },
-            'Los Lagos': { 8: [1, 23, 28], 9: [2, 24, 29], 10: [3, 25, 30], 11: [4, 26, 1] },
-            'Aysén': { 8: [2, 24, 29], 9: [3, 25, 30], 10: [4, 26, 1], 11: [5, 27, 2] },
-            'Magallanes': { 8: [3, 10, 30], 9: [4, 11, 1], 10: [5, 12, 2], 11: [6, 13, 3] },
-            
-            'Isla de Pascua - Rapa Nui': { 8: [1, 9, 26], 9: [2, 10, 27], 10: [3, 11, 28], 11: [4, 12, 29] },
-            'Juan Fernández': { 8: [2, 10, 27], 9: [3, 11, 28], 10: [4, 12, 29], 11: [5, 13, 30] },
-
-            'Director Nacional': { 8: [10, 20, 30], 9: [11, 21, 1], 10: [12, 22, 2], 11: [13, 23, 3] },
-            'Jefe Depto Alerta T.': { 8: [11, 21, 29], 9: [12, 22, 30], 10: [13, 23, 1], 11: [1, 24, 2] },
+        // Estructura de datos simplificada para el mockup, cubriendo ambos años.
+        const basePlanning = {
+            'Arica y Parinacota': [10, 27],
+            'Tarapacá': [11, 28],
+            'Antofagasta': [12, 29],
+            'Atacama': [13, 30],
+            'Coquimbo': [1, 14, 25],
+            'Valparaíso': [2, 15, 26],
+            'Metropolitana': [3, 16, 27],
+            "O'Higgins": [4, 17, 28],
+            'Maule': [5, 18, 29],
+            'Ñuble': [6, 19, 30],
+            'Biobío': [7, 20, 25],
+            'La Araucanía': [8, 21, 26],
+            'Los Ríos': [9, 22, 27],
+            'Los Lagos': [1, 23, 28],
+            'Aysén': [2, 24, 29],
+            'Magallanes': [3, 10, 30],
+            'Isla de Pascua - Rapa Nui': [1, 9, 26],
+            'Juan Fernández': [2, 10, 27],
+            'Director Nacional': [10, 20, 30],
+            'Jefe Depto Alerta T.': [11, 21, 29],
         };
 
         const regions = [
-            { name: 'UNIDADES REGIONALES', type: 'header', subtitle: 'Sat./PTT Iridium, BGAN y Regional - Int. Satelital' },
+            // Subtítulo inyectado en la misma celda de la cabecera del grupo
+            { name: 'UNIDADES REGIONALES', type: 'header', subtitle: '(Sat./PTT Iridium, BGAN y Regional - Int. Satelital)' },
             { name: 'Arica y Parinacota', type: 'region' },
             { name: 'Tarapacá', type: 'region' },
             { name: 'Antofagasta', type: 'region' },
@@ -253,31 +311,60 @@ Este calendario es independiente de las pruebas satelitales que están planifica
             { name: 'Aysén', type: 'region' },
             { name: 'Magallanes', type: 'region' },
             
-            { name: 'TERRITORIO INSULAR con NIVEL CENTRAL', type: 'header', subtitle: 'Isla de Pascua y Archipiélago Juan Fernández' },
+            { name: 'TERRITORIO INSULAR con NIVEL CENTRAL', type: 'header', subtitle: '(Isla de Pascua y Archipiélago Juan Fernández)' },
             { name: 'Isla de Pascua - Rapa Nui', type: 'insular' },
             { name: 'Juan Fernández', type: 'insular' },
 
-            { name: 'AUTORIDADES SENAPRED', type: 'header', subtitle: 'Director Nacional - Jefe Depto. Alerta Temprana' },
+            { name: 'AUTORIDADES SENAPRED', type: 'header', subtitle: '(Director Nacional - Jefe Depto. Alerta Temprana)' },
             { name: 'Director Nacional', type: 'authority' },
             { name: 'Jefe Depto Alerta T.', type: 'authority' },
         ];
+        
+        // --- 2. LÓGICA DEL CALENDARIO Y NAVEGACIÓN ---
+        
+        let currentDate = new Date();
+        let currentYear = START_YEAR;
+        let currentMonth = START_MONTH; 
 
-        // --- 2. LÓGICA DEL CALENDARIO Y MODAL ---
-        
-        // 1. Determinar el mes inicial automáticamente
-        let initialMonth = START_MONTH;
-        const today = new Date();
-        
-        // Solo aplicar si estamos en el mismo año de planificación (2025) y dentro del rango de meses
-        if (today.getFullYear() === YEAR) {
-            const currentMonthIndex = today.getMonth();
-            if (currentMonthIndex >= START_MONTH && currentMonthIndex <= END_MONTH) {
-                initialMonth = currentMonthIndex;
+        /**
+         * Inicializa la fecha actual para el componente.
+         * Si el año actual está dentro del rango (2025/2026), se centra en el mes actual.
+         */
+        function initializeDate() {
+            const todayYear = currentDate.getFullYear();
+            const todayMonth = currentDate.getMonth();
+
+            if (todayYear === START_YEAR && todayMonth >= START_MONTH) {
+                currentMonth = todayMonth;
+                currentYear = todayYear;
+            } else if (todayYear === END_YEAR && todayMonth <= END_MONTH) {
+                currentMonth = todayMonth;
+                currentYear = todayYear;
+            } else if (todayYear > END_YEAR) {
+                currentMonth = END_MONTH;
+                currentYear = END_YEAR;
+            } else {
+                currentMonth = START_MONTH;
+                currentYear = START_YEAR;
             }
         }
         
-        let currentMonth = initialMonth; 
-        let currentYear = YEAR;
+        /**
+         * Aplica un desplazamiento periódico al día de planificación basado en el mes y año (mockup).
+         */
+        function getScheduledDays(regionName, month, year) {
+            const totalMonthsFromStart = (year - START_YEAR) * 12 + month - START_MONTH;
+            const daysOffset = totalMonthsFromStart % 4; // Desplazamiento periódico de 4 meses
+
+            const baseDays = basePlanning[regionName] || [];
+            
+            return baseDays.map(day => {
+                let newDay = day + daysOffset;
+                // Asegurar que no exceda el número de días en el mes (no es perfecto, es mockup)
+                if (newDay > 30) newDay = newDay - 30;
+                return newDay;
+            }).filter(d => d > 0);
+        }
 
         /**
          * Obtiene el número de días del mes.
@@ -291,7 +378,6 @@ Este calendario es independiente de las pruebas satelitales que están planifica
          */
         function getFirstDayOfMonth(year, month) {
             let day = new Date(year, month, 1).getDay();
-            // Corregir: 0 (Domingo) debe ser 7 para que el Lunes sea 1
             return day === 0 ? 7 : day;
         }
 
@@ -311,6 +397,23 @@ Este calendario es independiente de las pruebas satelitales que están planifica
          */
         function closeModal() {
             document.getElementById('event-modal-overlay').style.display = 'none';
+        }
+        
+        /**
+         * Maneja la acción de imprimir (o guardar como PDF).
+         */
+        function printCalendar() {
+            // Muestra el título específico para impresión
+            document.getElementById('print-title').classList.remove('hidden');
+            document.getElementById('print-month-year').textContent = `${MONTH_NAMES[currentMonth]} ${currentYear}`;
+
+            // Llama a la función de impresión nativa del navegador
+            window.print();
+            
+            // Oculta el título específico para impresión después de la acción (o usa afterprint event)
+            setTimeout(() => {
+                 document.getElementById('print-title').classList.add('hidden');
+            }, 100); 
         }
 
         /**
@@ -336,7 +439,6 @@ Este calendario es independiente de las pruebas satelitales que están planifica
             
             for (let i = 1; i <= daysInMonth; i++) {
                 const dayIndex = (firstDay + i - 2) % 7; 
-                // Asegura que el índice del día de la semana sea 0-6
                 const correctedDayIndex = dayIndex < 0 ? dayIndex + 7 : dayIndex; 
                 const dayLabel = dayLabels[correctedDayIndex];
                 const isWeekend = correctedDayIndex >= 5; // 5=Sá, 6=Do
@@ -378,23 +480,24 @@ Este calendario es independiente de las pruebas satelitales que están planifica
             regions.forEach((item, index) => {
                 const isEvenRow = index % 2 === 0;
                 const rowBg = isEvenRow ? 'bg-white' : 'bg-gray-50'; // Zebra-striping
-                const regionData = planningData[item.name] || {};
-                const scheduledDays = regionData[currentMonth] || [];
+                
+                const scheduledDays = getScheduledDays(item.name, currentMonth, currentYear);
 
                 if (item.type === 'header') {
-                    // Fila de encabezado de grupo
+                    // Fila de encabezado de grupo (Contiene título y subtítulo)
                     planningBody.innerHTML += `
-                        <tr class="group-header-row border-t border-gray-400">
+                        <tr class="group-header-row border-b border-gray-400">
+                            <!-- Columna principal del grupo (Título UNIDADES REGIONALES) -->
                             <td class="group-header py-1 px-4 text-gray-800 sticky-region-col bg-gray-300 border-r border-gray-400">
                                 ${item.name}
-                                <br>
-                                <span class="text-[0.65rem] font-normal text-gray-700">(${item.subtitle})</span>
                             </td>
-                            <td colspan="${daysInMonth}" class="group-header py-1 px-4 bg-gray-300 border border-gray-300 border-t-0 border-b-0">
-                                <!-- Columna de relleno para el resto del ancho -->
+                            <!-- Celda derecha que ocupa todo el espacio de los días y contiene el subtítulo -->
+                            <td colspan="${daysInMonth}" class="group-header-subtitle-cell">
+                                ${item.subtitle}
                             </td>
                         </tr>
                     `;
+
                 } else {
                     // Fila de datos de la región
                     let regionRow = `
@@ -423,25 +526,38 @@ Este calendario es independiente de las pruebas satelitales que están planifica
                 }
             });
             
-            // Habilitar/Deshabilitar botones de navegación
-            document.querySelector('#month-navigation button:first-child').disabled = currentMonth <= START_MONTH;
-            document.querySelector('#month-navigation button:last-child').disabled = currentMonth >= END_MONTH;
+            // Lógica de deshabilitación de botones:
+            
+            const currentTotalMonths = (currentYear - START_YEAR) * 12 + currentMonth;
+            const startTotalMonths = (START_MONTH);
+            const endTotalMonths = (END_YEAR - START_YEAR) * 12 + END_MONTH;
+            
+            document.querySelector('#month-navigation button:first-child').disabled = currentTotalMonths <= startTotalMonths;
+            document.querySelector('#month-navigation button:last-child').disabled = currentTotalMonths >= endTotalMonths;
         }
 
         /**
-         * Cambia el mes actual y vuelve a renderizar.
+         * Cambia el mes/año actual y vuelve a renderizar.
          */
         function changeMonth(delta) {
-            let newMonth = currentMonth + delta;
+            let newDate = new Date(currentYear, currentMonth + delta, 1);
+            let newYear = newDate.getFullYear();
+            let newMonth = newDate.getMonth();
             
-            if (newMonth >= START_MONTH && newMonth <= END_MONTH) {
+            const isWithinRange = 
+                (newYear > START_YEAR || (newYear === START_YEAR && newMonth >= START_MONTH)) &&
+                (newYear < END_YEAR || (newYear === END_YEAR && newMonth <= END_MONTH));
+                
+            if (isWithinRange) {
                 currentMonth = newMonth;
+                currentYear = newYear;
                 renderPlanningGrid();
             }
         }
 
         // Inicializar el calendario al cargar la página
         window.onload = () => {
+            initializeDate(); 
             renderPlanningGrid();
         };
         
