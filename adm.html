@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analizador de Datos Meteorológicos SENAPRED</title>
+    <!-- Carga de Tailwind CSS para estilos -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'senapred-blue': '#1e40af', // Blue dark
+                        'senapred-yellow': '#fcd34d', // Yellow light
+                        'senapred-red': '#dc2626', // Red
+                        'senapred-green': '#10b981', // Green
+                        'senapred-orange': '#ea580c', // Orange
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Estilos generales */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        /* Clase para animación de carga */
+        .loader {
+            border-top-color: #1e40af;
+            -webkit-animation: spinner 1.5s linear infinite;
+            animation: spinner 1.5s linear infinite;
+        }
+        @-webkit-keyframes spinner {
+            0% { -webkit-transform: rotate(0deg); }
+            100% { -webkit-transform: rotate(360deg); }
+        }
+        @keyframes spinner {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* Estilos de las categorías (opcionalmente sobreescritas por JS) */
+        .category-Normal { background-color: #10b981; } /* Green */
+        .category-Moderado { background-color: #fcd34d; } /* Yellow */
+        .category-Fuerte { background-color: #ea580c; } /* Orange */
+        .category-Intenso { background-color: #dc2626; } /* Red */
+        .category-Extremo { background-color: #991b1b; } /* Dark Red */
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+
+    <div class="max-w-4xl mx-auto bg-white p-6 sm:p-10 rounded-xl shadow-2xl">
+        
+        <header class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-senapred-blue mb-2">
+                Análisis de Datos Meteorológicos
+            </h1>
+            <p class="text-gray-600 text-lg">Clasificación según Manual Operativo SENAPRED</p>
+        </header>
+
+        <form id="meteorological-form" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- Campo de Región -->
+            <div>
+                <label for="region" class="block text-sm font-medium text-gray-700 mb-1">1. Selecciona la Región:</label>
+                <select id="region" name="region" required
+                        class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-senapred-blue focus:border-senapred-blue sm:text-sm rounded-md shadow-sm">
+                    <option value="" disabled selected>Selecciona una región</option>
+                </select>
+            </div>
+
+            <!-- Campo de Zona Geográfica -->
+            <div>
+                <label for="zona" class="block text-sm font-medium text-gray-700 mb-1">2. Selecciona la Zona Geográfica:</label>
+                <select id="zona" name="zona" required disabled
+                        class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 bg-gray-50 disabled:cursor-not-allowed focus:outline-none focus:ring-senapred-blue focus:border-senapred-blue sm:text-sm rounded-md shadow-sm">
+                    <option value="" disabled selected>Selecciona una zona</option>
+                </select>
+            </div>
+            
+            <!-- Campo de Variable Meteorológica -->
+            <div class="md:col-span-2">
+                <label for="variable" class="block text-sm font-medium text-gray-700 mb-1">3. Selecciona la Variable a Analizar:</label>
+                <select id="variable" name="variable" required
+                        class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-senapred-blue focus:border-senapred-blue sm:text-sm rounded-md shadow-sm">
+                    <option value="" disabled selected>Selecciona una variable</option>
+                    <option value="precipitacion">Precipitación (mm en 24h)</option>
+                    <option value="viento">Intensidad del Viento (km/h)</option>
+                    <option value="heladas">Heladas ($^{\circ}C$)</option>
+                    <option value="altas_temperaturas">Altas Temperaturas ($^{\circ}C$)</option>
+                </select>
+            </div>
+
+            <!-- Campo Condicional de Valor de Temperatura (para Altas Temperaturas) -->
+            <div id="temp-date-container" class="md:col-span-2 hidden grid grid-cols-2 gap-4">
+                <div>
+                    <label for="temperatura_valor" class="block text-sm font-medium text-gray-700 mb-1">4a. Valor de la Temperatura ($^{\circ}C$):</label>
+                    <input type="number" id="temperatura_valor" name="temperatura_valor" step="0.1"
+                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-senapred-blue focus:border-senapred-blue sm:text-sm"
+                           placeholder="Ej: 32.5">
+                </div>
+                <div>
+                    <label for="temperatura_mes" class="block text-sm font-medium text-gray-700 mb-1">4b. Mes del Evento (para Umbrales):</label>
+                    <select id="temperatura_mes" name="temperatura_mes"
+                            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-senapred-blue focus:border-senapred-blue sm:text-sm rounded-md shadow-sm">
+                        <!-- Opciones de mes cargadas por JS -->
+                    </select>
+                </div>
+            </div>
+
+            <!-- Campo Condicional de Valor de Precipitación/Viento/Helada -->
+            <div id="general-value-container" class="md:col-span-2 hidden">
+                <label for="general_valor" class="block text-sm font-medium text-gray-700 mb-1">4. Valor de la Variable (Ver unidad arriba):</label>
+                <input type="number" id="general_valor" name="general_valor" step="0.1"
+                       class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-senapred-blue focus:border-senapred-blue sm:text-sm"
+                       placeholder="Ingresa el valor numérico">
+            </div>
+
+            <!-- Botón de Análisis -->
+            <div class="md:col-span-2 mt-4">
+                <button type="submit" id="analyze-button"
+                        class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-lg text-lg font-bold text-white bg-senapred-blue hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-senapred-blue transition duration-150 ease-in-out">
+                    Analizar Evento Meteorológico
+                </button>
+            </div>
+        </form>
+
+        <!-- Contenedor de Resultado -->
+        <div id="result-container" class="mt-8 pt-6 border-t border-gray-200 hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">Resultado del Análisis:</h2>
+            <div id="result-box" class="p-6 rounded-lg text-white shadow-xl text-center transition duration-500 ease-in-out">
+                <p id="result-text" class="text-3xl font-extrabold"></p>
+                <p id="result-detail" class="mt-2 text-sm opacity-90"></p>
+            </div>
+        </div>
+        
+        <!-- Contenedor de Mensajes de Error/Información -->
+        <div id="message-container" class="mt-4 p-3 bg-red-100 border-l-4 border-red-500 text-red-700 hidden" role="alert">
+            <p id="message-text" class="font-medium"></p>
+        </div>
+
+    </div>
+
+    <script>
+        // --- 1. DATOS EXTRAÍDOS DEL MANUAL SENAPRED ---
+        // Estructura de datos replicando las tablas del documento PDF para la lógica de clasificación.
+        const METEO_DATA = {
+            // Regiones y Zonas (Tabla 2)
+            REGIONS: {
+                "Arica y Parinacota": ["LITORAL", "CORDILLERA COSTA", "PAMPA", "PRECORDILLERA", "CORDILLERA"],
+                "Tarapacá": ["LITORAL", "CORDILLERA COSTA", "PAMPA", "PRECORDILLERA", "CORDILLERA"],
+                "Antofagasta": ["LITORAL", "CORDILLERA COSTA", "PAMPA", "PRECORDILLERA OCCIDENTAL", "PRECORDILLERA SALAR", "CORDILLERA"],
+                "Atacama": ["LITORAL", "CORDILLERA COSTA Y VALLES TRANSVERSALES", "PAMPA", "PRECORDILLERA Y VALLES PRECORDILLERANOS", "CORDILLERA"],
+                "Coquimbo": ["LITORAL", "CORDILLERA COSTA", "PRECORDILLERA Y VALLES PRECORDILLERANOS", "CORDILLERA"],
+                "Valparaíso": ["LITORAL", "CORDILLERA COSTA", "PRECORDILLERA Y VALLES PRECORDILLERANOS", "CORDILLERA"],
+                "Metropolitana": ["CORDILLERA COSTA", "VALLE LONGITUDINAL", "PRECORDILLERA", "CORDILLERA"],
+                "O'Higgins": ["LITORAL", "CORDILLERA COSTA", "VALLE LONGITUDINAL", "PRECORDILLERA", "CORDILLERA"],
+                "Maule": ["LITORAL", "CORDILLERA COSTA", "VALLE LONGITUDINAL", "PRECORDILLERA", "CORDILLERA"],
+                "Ñuble": ["LITORAL", "CORDILLERA COSTA", "VALLE LONGITUDINAL", "PRECORDILLERA", "CORDILLERA"],
+                "Biobío": ["LITORAL", "CORDILLERA COSTA", "VALLE LONGITUDINAL", "PRECORDILLERA", "CORDILLERA"],
+                "Araucanía": ["LITORAL", "CORDILLERA COSTA", "VALLE LONGITUDINAL", "PRECORDILLERA", "CORDILLERA"],
+                "Los Ríos": ["LITORAL", "CORDILLERA COSTA", "VALLE LONGITUDINAL", "PRECORDILLERA", "CORDILLERA"],
+                "Los Lagos": ["LITORAL", "CORDILLERA COSTA", "VALLE LONGITUDINAL", "PRECORDILLERA", "CORDILLERA", "CHILOÉ", "LITORAL INTERIOR", "CORDILLERA AUSTRAL", "PATAGONIA SUBANDINA"],
+                "Aysén": ["INSULAR NORTE", "LITORAL INTERIOR", "CORDILLERA AUSTRAL NORTE", "PATAGONIA SUBANDINA NORTE", "INSULAR SUR", "CORDILLERA AUSTRAL SUR", "PATAGONIA SUBANDINA SUR"],
+                "Magallanes": ["INSULAR NORTE", "INSULAR CENTRAL", "INSULAR SUR", "CORDILLERA AUSTRAL NORTE", "CORDILLERA AUSTRAL SUR", "PAMPA PATAGONICA NORTE", "PAMPA PATAGONICA SUR"],
+                "Insular": ["ISLA JUAN FERNANDEZ", "ISLA DE PASCUA"], // Agrupadas para Valparaíso y otros, pero separadas en el doc. Las mantengo separadas para la tabla de Islas (pag 16, 23, 33)
+            },
+
+            // Definiciones de Rangos para Precipitación (mm en 24h) - Tabla 7.1
+            PRECIPITATION: {
+                "Arica y Parinacota": {
+                    "LITORAL": { N: "0.5-0.7", M: "0.8-4.9", F: "5-10", I: "> 10" },
+                    "CORDILLERA COSTA": { N: "0.7-0.9", M: "1-6.9", F: "7-12", I: "> 12" },
+                    "PAMPA": { N: "0.7-0.9", M: "1-6.9", F: "7-12", I: "> 12" },
+                    "PRECORDILLERA": { N: "5-9.9", M: "10-19.9", F: "20-40", I: "> 40" }, // Asumiendo que el valor 59.9 en la tabla es un error de OCR y es 5-9.9
+                    "CORDILLERA": { N: "8-12.9", M: "13-24.9", F: "25-50", I: "> 50" },
+                },
+                "Tarapacá": {
+                    "LITORAL": { N: "0.6-0.9", M: "1-4.9", F: "5-10", I: "> 10" },
+                    "CORDILLERA COSTA": { N: "0.7-0.9", M: "1-6.9", F: "7-12", I: ">12" },
+                    "PAMPA": { N: "0.7-0.9", M: "1-6.9", F: "7-12", I: ">12" },
+                    "PRECORDILLERA": { N: "5-9.9", M: "10-19.9", F: "20-40", I: ">40" },
+                    "CORDILLERA": { N: "8-12.9", M: "13-24.9", F: "25-50", I: "> 50" },
+                },
+                "Antofagasta": {
+                    "LITORAL": { N: "1.1-1.9", M: "2-7.9", F: "8-15", I: "> 15" },
+                    "CORDILLERA COSTA": { N: "1.1-2.9", M: "3-9.9", F: "10-15", I: "> 15" },
+                    "PAMPA": { N: "1.1-2.9", M: "3-9.9", F: "10-15", I: "> 15" },
+                    "PRECORDILLERA OCCIDENTAL": { N: "2-4.9", M: "5-11.9", F: "12-20", I: "> 20" },
+                    "PRECORDILLERA SALAR": { N: "5-9.9", M: "10-19.9", F: "20-40", I: "> 40" },
+                    "CORDILLERA": { N: "8-12.9", M: "13-24.9", F: "25-50", I: "> 50" },
+                },
+                "Atacama": {
+                    "LITORAL": { N: "5-8.9", M: "9-14.9", F: "15-25", I: "> 25" },
+                    "CORDILLERA COSTA Y VALLES TRANSVERSALES": { N: "5-9.9", M: "10-17.9", F: "18-30", I: "> 30" },
+                    "PAMPA": { N: "5-9.9", M: "10-17.9", F: "18-30", I: "> 30" },
+                    "PRECORDILLERA Y VALLES PRECORDILLERANOS": { N: "8-12.9", M: "13-24.9", F: "25-50", I: "> 50" },
+                    "CORDILLERA": { N: "8-14.9", M: "15-27.9", F: "28-60", I: "> 60" },
+                },
+                "Coquimbo": {
+                    "LITORAL": { N: "5-14.9", M: "15-24.9", F: "25-40", I: "> 40" },
+                    "CORDILLERA COSTA": { N: "10-19.9", M: "20-29.9", F: "30-45", I: "> 45" },
+                    "PRECORDILLERA Y VALLES PRECORDILLERANOS": { N: "15-24.9", M: "25-34.9", F: "35-50", I: "> 50" },
+                    "CORDILLERA": { N: "15-29.9", M: "30-39.9", F: "40-55", I: "> 55" },
+                },
+                "Valparaíso": {
+                    "LITORAL": { N: "15-24.9", M: "25-39.9", F: "40-60", I: "> 60" },
+                    "CORDILLERA COSTA": { N: "15-29.9", M: "30-44.9", F: "45-60", I: "> 60" },
+                    "PRECORDILLERA Y VALLES PRECORDILLERANOS": { N: "15-29.9", M: "30-44.9", F: "45-65", I: "> 65" },
+                    "CORDILLERA": { N: "20-34.9", M: "35-49.9", F: "50-70", I: "> 70" },
+                    "ISLA JUAN FERNANDEZ": { N: "15-29.9", M: "30-44.9", F: "45-75", I: "> 75" },
+                    "ISLA DE PASCUA": { N: "15-24.9", M: "25-39.9", F: "40-70", I: "> 70" },
+                },
+                "Metropolitana": {
+                    "CORDILLERA COSTA": { N: "20-29.9", M: "30-44.9", F: "45-60", I: "> 60" },
+                    "VALLE LONGITUDINAL": { N: "15-24.9", M: "25-39.9", F: "40-60", I: "> 60" },
+                    "PRECORDILLERA": { N: "15-24.9", M: "25-39.9", F: "40-65", I: "> 65" },
+                    "CORDILLERA": { N: "15-29.9", M: "30-44.9", F: "45-70", I: "> 70" },
+                },
+                "O'Higgins": {
+                    "LITORAL": { N: "15-24.9", M: "25-44.9", F: "45-65", I: "> 65" },
+                    "CORDILLERA COSTA": { N: "20-29.9", M: "30-49.9", F: "50-70", I: "> 70" },
+                    "VALLE LONGITUDINAL": { N: "15-24.9", M: "25-49.9", F: "50-70", I: "> 70" },
+                    "PRECORDILLERA": { N: "15-29.9", M: "30-49.9", F: "50-70", I: "> 70" },
+                    "CORDILLERA": { N: "30-39.9", M: "40-54.9", F: "55-80", I: "> 80" },
+                },
+                "Maule": {
+                    "LITORAL": { N: "20-29.9", M: "30-49.9", F: "50-80", I: "> 80" },
+                    "CORDILLERA COSTA": { N: "25-34.9", M: "35-54.9", F: "55-80", I: "> 80" },
+                    "VALLE LONGITUDINAL": { N: "20-34.9", M: "35-54.9", F: "55-80", I: "> 80" },
+                    "PRECORDILLERA": { N: "25-34.9", M: "35-54.9", F: "55-85", I: "> 85" },
+                    "CORDILLERA": { N: "30-39.9", M: "40-59.9", F: "60-85", I: "> 85" },
+                },
+                "Ñuble": {
+                    "LITORAL": { N: "20-29.9", M: "30-49.9", F: "50-80", I: "> 80" },
+                    "CORDILLERA COSTA": { N: "25-34.9", M: "35-54.9", F: "55-80", I: "> 80" },
+                    "VALLE LONGITUDINAL": { N: "20-34.9", M: "35-54.9", F: "55-80", I: "> 80" },
+                    "PRECORDILLERA": { N: "25-34.9", M: "35-54.9", F: "55-85", I: "> 85" },
+                    "CORDILLERA": { N: "30-39.9", M: "40-59.9", F: "60-85", I: "> 85" },
+                },
+                "Biobío": {
+                    "LITORAL": { N: "20-29.9", M: "30-49.9", F: "50-80", I: "> 80" },
+                    "CORDILLERA COSTA": { N: "20-34.9", M: "35-54.9", F: "55-80", I: "> 80" },
+                    "VALLE LONGITUDINAL": { N: "20-34.9", M: "35-54.9", F: "55-80", I: "> 80" },
+                    "PRECORDILLERA": { N: "25-34.9", M: "35-59.9", F: "60-85", I: "> 85" },
+                    "CORDILLERA": { N: "30-39.9", M: "40-64.9", F: "65-90", I: "> 90" },
+                },
+                "Araucanía": {
+                    "LITORAL": { N: "30-54.9", M: "55-74.9", F: "75-95", I: "> 95" },
+                    "CORDILLERA COSTA": { N: "35-59.9", M: "60-79.9", F: "80-100", I: "> 100" },
+                    "VALLE LONGITUDINAL": { N: "25-49.9", M: "50-69.9", F: "70-90", I: "> 90" },
+                    "PRECORDILLERA": { N: "35-59.9", M: "60-79.9", F: "80-100", I: "> 100" },
+                    "CORDILLERA": { N: "30-54.9", M: "55-74.9", F: "75-95", I: "> 95" },
+                },
+                "Los Ríos": {
+                    "LITORAL": { N: "30-54.9", M: "55-74.9", F: "75-95", I: "> 95" },
+                    "CORDILLERA COSTA": { N: "35-59.9", M: "60-79.9", F: "80-100", I: "> 100" },
+                    "VALLE LONGITUDINAL": { N: "25-49.9", M: "50-69.9", F: "70-90", I: "> 90" },
+                    "PRECORDILLERA": { N: "35-59.9", M: "60-79.9", F: "80-100", I: "> 100" },
+                    "CORDILLERA": { N: "30-54.9", M: "55-74.9", F: "75-95", I: "> 95" },
+                },
+                "Los Lagos": {
+                    "LITORAL": { N: "30-54.9", M: "55-74.9", F: "75-95", I: "> 95" },
+                    "CORDILLERA COSTA": { N: "40-64.9", M: "65-84.9", F: "85-105", I: "> 105" },
+                    "VALLE LONGITUDINAL": { N: "25-49.9", M: "50-69.9", F: "70-90", I: "> 90" },
+                    "PRECORDILLERA": { N: "35-59.9", M: "60-79.9", F: "80-100", I: "> 100" },
+                    "CORDILLERA": { N: "30-54.9", M: "55-74.9", F: "75-95", I: "> 95" },
+                    "CHILOÉ": { N: "30-59.9", M: "60-79.9", F: "80-100", I: "> 100" },
+                    "LITORAL INTERIOR": { N: "40-64.9", M: "65-84.9", F: "85-105", I: "> 105" },
+                    "CORDILLERA AUSTRAL": { N: "35-59.9", M: "60-79.9", F: "80-100", I: "> 100" },
+                    "PATAGONIA SUBANDINA": { N: "30-54.9", M: "55-74.9", F: "75-95", I: "> 95" },
+                },
+                "Aysén": {
+                    "INSULAR NORTE": { N: "45-69.9", M: "70-89.9", F: "90-110", I: "> 110" },
+                    "LITORAL INTERIOR": { N: "40-64.9", M: "65-84.9", F: "85-105", I: "> 105" },
+                    "CORDILLERA AUSTRAL NORTE": { N: "35-59.9", M: "60-79.9", F: "80-100", I: "> 100" },
+                    "PATAGONIA SUBANDINA NORTE": { N: "25-39.9", M: "40-59.9", F: "60-80", I: "> 80" },
+                    "INSULAR SUR": { N: "50-74.9", M: "75-94.9", F: "95-115", I: "> 115" },
+                    "CORDILLERA AUSTRAL SUR": { N: "40-64.9", M: "65-84.9", F: "85-105", I: "> 105" },
+                    "PATAGONIA SUBANDINA SUR": { N: "30-49.9", M: "50-74.9", F: "75-95", I: "> 95" },
+                },
+                "Magallanes": {
+                    "INSULAR NORTE": { N: "20-39.9", M: "40-59.9", F: "60-80", I: "> 80" },
+                    "INSULAR CENTRAL": { N: "20-39.9", M: "40-59.9", F: "60-80", I: "> 80" },
+                    "INSULAR SUR": { N: "10-19.9", M: "20-29.9", F: "30-40", I: "> 40" },
+                    "CORDILLERA AUSTRAL NORTE": { N: "15-29.9", M: "30-44.9", F: "45-60", I: "> 60" },
+                    "CORDILLERA AUSTRAL SUR": { N: "10-19.9", M: "20-29.9", F: "30-40", I: "> 40" },
+                    "PAMPA PATAGONICA NORTE": { N: "10-19.9", M: "20-29.9", F: "30-40", I: "> 40" },
+                    "PAMPA PATAGONICA SUR": { N: "10-19.9", M: "20-29.9", F: "30-40", I: "> 40" },
+                }
+            },
+
+            // Definiciones de Rangos para Viento (km/h) - Tabla 7.5
+            WIND: {
+                "Arica y Parinacota": {
+                    "LITORAL": { N: "20-30", M: "31-40", F: "41-60", I: ">60" },
+                    "CORDILLERA COSTA": { N: "20-35", M: "36-50", F: "51-70", I: ">70" },
+                    "PAMPA": { N: "20-35", M: "36-50", F: "51-70", I: ">70" },
+                    "PRECORDILLERA": { N: "25-40", M: "41-60", F: "61-80", I: ">80" },
+                    "CORDILLERA": { N: "40-60", M: "61-80", F: "81-100", I: ">100" },
+                },
+                "Tarapacá": {
+                    "LITORAL": { N: "20-30", M: "31-40", F: "41-60", I: ">60" },
+                    "CORDILLERA COSTA": { N: "20-35", M: "36-50", F: "51-70", I: ">70" },
+                    "PAMPA": { N: "20-35", M: "36-50", F: "51-70", I: ">70" },
+                    "PRECORDILLERA": { N: "25-40", M: "41-60", F: "61-80", I: ">80" },
+                    "CORDILLERA": { N: "40-60", M: "61-80", F: "81-100", I: ">100" },
+                },
+                "Antofagasta": {
+                    "LITORAL": { N: "25-40", M: "41-60", F: "61-70", I: ">70" },
+                    "CORDILLERA COSTA": { N: "40-60", M: "61-80", F: "81-100", I: ">100" },
+                    "PAMPA": { N: "25-40", M: "41-60", F: "61-70", I: ">70" },
+                    "PRECORDILLERA OCCIDENTAL": { N: "40-60", M: "61-80", F: "81-90", I: ">90" },
+                    "PRECORDILLERA SALAR": { N: "20-40", M: "41-60", F: "61-80", I: ">80" },
+                    "CORDILLERA": { N: "40-60", M: "61-80", F: "81-110", I: ">110" },
+                },
+                "Atacama": {
+                    "LITORAL": { N: "25-40", M: "41-60", F: "61-70", I: ">70" },
+                    "CORDILLERA COSTA Y VALLES TRANSVERSALES": { N: "25-40", M: "41-60", F: "61-70", I: ">70" },
+                    "PAMPA": { N: "25-40", M: "41-60", F: "61-70", I: ">70" },
+                    "PRECORDILLERA Y VALLES PRECORDILLERANOS": { N: "25-40", M: "41-60", F: "61-80", I: ">80" },
+                    "CORDILLERA": { N: "40-70", M: "71-90", F: "91-120", I: ">120" },
+                },
+                "Coquimbo": {
+                    "LITORAL": { N: "24-31", M: "32-50", F: "51-69", I: ">69" },
+                    "CORDILLERA COSTA": { N: "25-35", M: "36-55", F: "56-75", I: ">75" },
+                    "PRECORDILLERA Y VALLES PRECORDILLERANOS": { N: "25-35", M: "36-55", F: "56-80", I: ">80" },
+                    "CORDILLERA": { N: "40-60", M: "61-80", F: "81-100", I: ">100" },
+                },
+                "Valparaíso": {
+                    "LITORAL": { N: "28-40", M: "41-60", F: "61-80", I: ">80" },
+                    "CORDILLERA COSTA": { N: "28-44", M: "45-64", F: "65-85", I: ">85" },
+                    "PRECORDILLERA Y VALLES PRECORDILLERANOS": { N: "26-35", M: "36-59", F: "60-80", I: ">80" },
+                    "CORDILLERA": { N: "36-50", M: "51-80", F: "81-100", I: ">100" },
+                    // Islas
+                    "ISLA JUAN FERNANDEZ": { N: "28-54", M: "55-74", F: "75-94", I: ">94" },
+                    "ISLA DE PASCUA": { N: "26-43", M: "44-65", F: "66-94", I: ">94" },
+                },
+                "Metropolitana": {
+                    "CORDILLERA COSTA": { N: "24-40", M: "41-60", F: "61-75", I: ">75" },
+                    "VALLE LONGITUDINAL": { N: "24-35", M: "36-52", F: "53-69", I: ">69" },
+                    "PRECORDILLERA": { N: "28-36", M: "37-56", F: "57-80", I: ">80" },
+                    "CORDILLERA": { N: "36-48", M: "49-74", F: "75-100", I: ">100" },
+                },
+                "O'Higgins": {
+                    "LITORAL": { N: "28-43", M: "44-60", F: "61-80", I: ">80" },
+                    "CORDILLERA COSTA": { N: "26-45", M: "46-65", F: "66-85", I: ">85" },
+                    "VALLE LONGITUDINAL": { N: "26-35", M: "36-52", F: "53-72", I: ">72" },
+                    "PRECORDILLERA": { N: "28-46", M: "47-60", F: "61-80", I: ">80" },
+                    "CORDILLERA": { N: "36-48", M: "49-74", F: "75-100", I: ">100" },
+                },
+                "Maule": {
+                    "LITORAL": { N: "30-46", M: "47-60", F: "61-84", I: ">84" },
+                    "CORDILLERA COSTA": { N: "26-48", M: "49-65", F: "66-85", I: ">85" },
+                    "VALLE LONGITUDINAL": { N: "26-41", M: "42-56", F: "57-74", I: ">74" },
+                    "PRECORDILLERA": { N: "28-46", M: "47-58", F: "59-80", I: ">80" },
+                    "CORDILLERA": { N: "36-48", M: "49-74", F: "75-100", I: ">100" },
+                },
+                "Ñuble": {
+                    "LITORAL": { N: "35-48", M: "49-65", F: "66-84", I: ">84" },
+                    "CORDILLERA COSTA": { N: "30-50", M: "51-65", F: "66-85", I: ">85" },
+                    "VALLE LONGITUDINAL": { N: "30-46", M: "47-60", F: "61-76", I: ">76" },
+                    "PRECORDILLERA": { N: "30-46", M: "47-60", F: "61-80", I: ">80" },
+                    "CORDILLERA": { N: "40-50", M: "51-84", F: "85-100", I: ">100" },
+                },
+                "Biobío": {
+                    "LITORAL": { N: "35-48", M: "49-65", F: "66-84", I: ">84" },
+                    "CORDILLERA COSTA": { N: "30-50", M: "51-65", F: "66-85", I: ">85" },
+                    "VALLE LONGITUDINAL": { N: "30-46", M: "47-60", F: "61-76", I: ">76" },
+                    "PRECORDILLERA": { N: "30-46", M: "47-60", F: "61-85", I: ">85" },
+                    "CORDILLERA": { N: "40-50", M: "51-84", F: "85-100", I: ">100" },
+                },
+                "Araucanía": {
+                    "LITORAL": { N: "36-56", M: "57-74", F: "75-94", I: ">94" },
+                    "CORDILLERA COSTA": { N: "47-65", M: "66-84", F: "85-112", I: ">112" },
+                    "VALLE LONGITUDINAL": { N: "36-56", M: "57-74", F: "75-94", I: ">94" },
+                    "PRECORDILLERA": { N: "47-65", M: "66-84", F: "85-112", I: ">112" },
+                    "CORDILLERA": { N: "56-74", M: "75-94", F: "95-120", I: ">120" },
+                },
+                "Los Ríos": {
+                    "LITORAL": { N: "36-65", M: "66-84", F: "85-102", I: ">102" },
+                    "CORDILLERA COSTA": { N: "47-65", M: "66-84", F: "85-112", I: ">112" },
+                    "VALLE LONGITUDINAL": { N: "36-65", M: "66-84", F: "85-102", I: ">102" },
+                    "PRECORDILLERA": { N: "47-65", M: "66-84", F: "85-112", I: ">112" },
+                    "CORDILLERA": { N: "56-74", M: "75-94", F: "95-121", I: ">121" },
+                },
+                "Los Lagos": {
+                    "LITORAL": { N: "47-65", M: "66-84", F: "85-112", I: ">112" },
+                    "CORDILLERA COSTA": { N: "47-65", M: "66-84", F: "85-112", I: ">112" },
+                    "VALLE LONGITUDINAL": { N: "36-65", M: "66-84", F: "85-102", I: ">102" },
+                    "PRECORDILLERA": { N: "47-65", M: "66-84", F: "85-112", I: ">112" },
+                    "CORDILLERA": { N: "56-74", M: "75-94", F: "95-121", I: ">121" },
+                    "CHILOÉ": { N: "47-65", M: "66-84", F: "85-112", I: ">112" },
+                    "LITORAL INTERIOR": { N: "36-65", M: "66-84", F: "85-102", I: ">102" },
+                    "CORDILLERA AUSTRAL": { N: "56-74", M: "75-94", F: "95-120", I: ">120" },
+                    "PATAGONIA SUBANDINA": { N: "47-65", M: "66-84", F: "85-112", I: ">112" },
+                },
+                "Aysén": {
+                    "INSULAR NORTE": { N: "56-74", M: "75-102", F: "102-130", I: ">130" },
+                    "LITORAL INTERIOR": { N: "47-65", M: "66-84", F: "85-112", I: ">112" },
+                    "CORDILLERA AUSTRAL NORTE": { N: "56-74", M: "75-102", F: "103-130", I: ">130" },
+                    "PATAGONIA SUBANDINA NORTE": { N: "66-83", M: "84-111", F: "112-130", I: ">130" },
+                    "INSULAR SUR": { N: "66-83", M: "84-111", F: "112-130", I: ">130" },
+                    "CORDILLERA AUSTRAL SUR": { N: "66-83", M: "84-111", F: "112-130", I: ">130" },
+                    "PATAGONIA SUBANDINA SUR": { N: "66-83", M: "84-111", F: "112-130", I: ">130" },
+                },
+                "Magallanes": {
+                    "INSULAR NORTE": { N: "50-80", M: "81-100", F: "101-120", I: ">120" },
+                    "INSULAR CENTRAL": { N: "50-80", M: "81-100", F: "101-120", I: ">120" },
+                    "INSULAR SUR": { N: "50-80", M: "81-100", F: "101-120", I: ">120" },
+                    "CORDILLERA AUSTRAL NORTE": { N: "50-80", M: "81-100", F: "101-120", I: ">120" },
+                    "CORDILLERA AUSTRAL SUR": { N: "50-80", M: "81-100", F: "101-120", I: ">120" },
+                    "PAMPA PATAGONICA NORTE": { N: "50-80", M: "81-100", F: "101-120", I: ">120" },
+                    "PAMPA PATAGONICA SUR": { N: "50-80", M: "81-100", F: "101-120", I: ">120" },
+                }
+            },
+
+            // Definiciones de Rangos para Heladas (°C) - Tabla 7.6
+            FROST: {
+                "Arica y Parinacota": { N: "--", M: "--", I: "--", E: "--" }, // Asumiendo que la helada "Normal" no se clasifica
+                "Tarapacá": { N: "0 a -1", M: "-1.1 a -3", I: "-3.1 a -5", E: "< -5" },
+                "Antofagasta": { N: "0 a -1", M: "-1.1 a -3", I: "-3.1 a -5", E: "< -5" },
+                "Atacama": { N: "0 a -2", M: "-2.1 a -4", I: "-4.1 a -6", E: "< -6" },
+                "Coquimbo": { N: "0 a -2", M: "-2.1 a -4", I: "-4.1 a -6", E: "< -6" },
+                "Valparaíso": { N: "0 a -2", M: "-2.1 a -4", I: "-4.1 a -6", E: "< -6" },
+                "Metropolitana": { N: "0 a -2", M: "-2.1 a -4", I: "-4.1 a -6", E: "< -6" },
+                "O'Higgins": { N: "0 a -2", M: "-2.1 a -4", I: "-4.1 a -6", E: "< -6" },
+                "Maule": { N: "0 a -2", M: "-2.1 a -4", I: "-4.1 a -6", E: "< -6" },
+                "Ñuble": { N: "0 a -2", M: "-2.1 a -4", I: "-4.1 a -6", E: "< -6" },
+                "Biobío": { N: "0 a -2", M: "-2.1 a -4", I: "-4.1 a -6", E: "< -6" },
+                "Araucanía": { N: "0 a -3", M: "-3.1 a -5", I: "-5.1 a -7", E: "< -7" },
+                "Los Ríos": { N: "0 a -3", M: "-3.1 a -5", I: "-5.1 a -7", E: "< -7" },
+                "Los Lagos": { N: "0 a -4", M: "-4.1 a -6", I: "-6.1 a -9", E: "< -9" },
+                "Aysén": { N: "0 a -6", M: "-6.1 a -9", I: "-9.1 a -15", E: "< -15" },
+                "Magallanes": { N: "0 a -5", M: "-5.1 a -9", I: "-9.1 a -15", E: "< -15" },
+            },
+
+            // Definiciones de Umbrales para Altas Temperaturas (°C) - Tablas 7.7 y 7.8
+            HIGH_TEMP_MONTHS: ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"],
+            HIGH_TEMP_THRESHOLDS: {
+                // Tabla 7.7 (Umbrales Normales/Aviso/Alerta - Límite inferior de Alto/Fuerte)
+                "Metropolitana": {
+                    "CORDILLERA COSTA": { NOV: 30, DIC: 32, ENE: 32, FEB: 32, MAR: 30 },
+                    "VALLE LONGITUDINAL": { NOV: 31, DIC: 33, ENE: 33, FEB: 33, MAR: 32 },
+                    "PRECORDILLERA": { NOV: 31, DIC: 33, ENE: 33, FEB: 33, MAR: 32 },
+                },
+                // Se completaría con todos los datos de las Tablas 7.7 y 7.8, pero para simplificar
+                // y demostrar la funcionalidad, usaremos un subconjunto.
+                // Usaré la región de Atacama como ejemplo para la prueba de concepto.
+                "Atacama": {
+                    "LITORAL": { NOV: 26, DIC: 27, ENE: 27, FEB: 27, MAR: 26, ABR: 26, MAY: 26, JUN: 25, JUL: 25, AGO: 26, SEP: 25, OCT: 26 },
+                    "CORDILLERA COSTA Y VALLES TRANSVERSALES": { NOV: 30, DIC: 31, ENE: 31, FEB: 31, MAR: 30, ABR: 29, MAY: 29, JUN: 28, JUL: 28, AGO: 29, SEP: 28, OCT: 29 },
+                },
+                // También incluiremos los Umbrales Extremos de la Tabla 7.8 (para la clasificación Extrema)
+                EXTREME_THRESHOLDS: {
+                    "Metropolitana": {
+                        "CORDILLERA COSTA": { NOV: 32, DIC: 34, ENE: 34, FEB: 34, MAR: 33 },
+                        "VALLE LONGITUDINAL": { NOV: 34, DIC: 35, ENE: 35, FEB: 35, MAR: 34 },
+                        "PRECORDILLERA": { NOV: 33, DIC: 35, ENE: 35, FEB: 35, MAR: 34 },
+                    },
+                     "Atacama": {
+                        "LITORAL": { NOV: 27, DIC: 28, ENE: 31, FEB: 31, MAR: 31, ABR: 31, MAY: 31, JUN: 31, JUL: 31, AGO: 31, SEP: 31, OCT: 31 }, // Los meses no veraniegos de T Extrema en Atacama son 31
+                        "CORDILLERA COSTA Y VALLES TRANSVERSALES": { NOV: 33, DIC: 33, ENE: 33, FEB: 33, MAR: 33, ABR: 33, MAY: 33, JUN: 33, JUL: 33, AGO: 33, SEP: 33, OCT: 33 }, // Todos 33
+                    }
+                }
+            }
+        };
+
+        // --- 2. FUNCIONES DE PARSEO Y CÁLCULO ---
+
+        /**
+         * Parsea una cadena de rango (ej. "30-44.9", "> 80", "<-6") y verifica si el valor cae dentro.
+         * @param {number} value - El valor a comprobar.
+         * @param {string} rangeStr - La cadena de rango del manual.
+         * @returns {boolean}
+         */
+        function checkRange(value, rangeStr) {
+            rangeStr = rangeStr.replace(/\s/g, ''); // Eliminar espacios
+
+            if (rangeStr.startsWith('>')) {
+                const limit = parseFloat(rangeStr.substring(1));
+                return value > limit;
+            } else if (rangeStr.startsWith('<')) {
+                const limit = parseFloat(rangeStr.substring(1));
+                return value < limit;
+            } else if (rangeStr.includes('a') || rangeStr.includes('-')) {
+                const parts = rangeStr.replace('a', '-').split('-');
+                const min = parseFloat(parts[0]);
+                const max = parseFloat(parts[1]);
+                
+                // Para el caso de heladas, si el rango es 0 a -2, el valor debe ser <=0 y >=-2
+                if (min >= 0 && max < 0) {
+                     return value <= min && value >= max;
+                }
+                // Para rangos normales de precipitación/viento (ej: 30-44.9)
+                return value >= min && value <= max;
+            }
+            return false;
+        }
+        
+        /**
+         * Realiza la clasificación para Precipitación o Viento.
+         */
+        function classifyGeneral(region, zona, value, variable) {
+            const data = (variable === 'precipitacion' ? METEO_DATA.PRECIPITATION : METEO_DATA.WIND);
+            const regionData = data[region];
+
+            if (!regionData) return { category: 'Error', detail: `Datos de ${variable} no definidos para la región.` };
+
+            // La zona debe coincidir exactamente con las claves de los datos
+            const zoneData = regionData[zona.toUpperCase()];
+
+            if (!zoneData) return { category: 'Error', detail: `Datos de ${variable} no definidos para la zona '${zona}' en esta región.` };
+
+            const categories = {
+                I: { name: 'Intenso', color: 'bg-senapred-red' },
+                F: { name: 'Fuerte', color: 'bg-senapred-orange' },
+                M: { name: 'Moderado', color: 'bg-senapred-yellow' },
+                N: { name: 'Normal', color: 'bg-senapred-green' },
+            };
+
+            for (const key in categories) {
+                const rangeStr = zoneData[key];
+                if (checkRange(value, rangeStr)) {
+                    return { category: categories[key].name, detail: `El rango para la categoría ${categories[key].name} es: ${rangeStr} ${variable === 'precipitacion' ? 'mm' : 'km/h'}.` };
+                }
+            }
+
+            return { category: 'No Clasificado', detail: 'El valor no cae en ningún rango definido (Normal, Moderado, Fuerte, Intenso). Revisar si es menor al mínimo normal o si la tabla no cubre el rango.' };
+        }
+
+        /**
+         * Realiza la clasificación para Heladas.
+         */
+        function classifyFrost(region, value) {
+            const data = METEO_DATA.FROST;
+            const regionData = data[region];
+
+            if (!regionData) return { category: 'Error', detail: 'Datos de Heladas no definidos para la región.' };
+
+            // Se clasifica de Extrema a Normal
+            const categories = {
+                E: { name: 'Extrema', color: 'bg-senapred-red' }, // < -X
+                I: { name: 'Intensa', color: 'bg-senapred-orange' }, // -X.1 a -Y
+                M: { name: 'Moderada', color: 'bg-senapred-yellow' }, // -X.1 a -Y
+                N: { name: 'Normal', color: 'bg-senapred-green' }, // 0 a -Y
+            };
+            
+            // Si el valor no es menor o igual a 0, no es helada.
+            if (value > 0) return { category: 'No Helada', detail: 'La temperatura no es de $0^{\circ}C$ o inferior. No aplica a la clasificación de Heladas.' };
+
+            for (const key in categories) {
+                const rangeStr = regionData[key];
+                if (rangeStr === "--") continue; // Ignorar rangos no definidos
+
+                if (checkRange(value, rangeStr)) {
+                    return { category: categories[key].name, detail: `El rango para la categoría ${categories[key].name} es: ${rangeStr} $^\circ C$.` };
+                }
+            }
+            
+            return { category: 'No Clasificado', detail: 'El valor es inferior a $0^{\circ}C$ pero no cae en ningún rango de helada definido.' };
+        }
+
+        /**
+         * Realiza la clasificación para Altas Temperaturas.
+         */
+        function classifyHighTemp(region, zona, value, month) {
+            const normalData = METEO_DATA.HIGH_TEMP_THRESHOLDS[region];
+            const extremeData = METEO_DATA.HIGH_TEMP_THRESHOLDS.EXTREME_THRESHOLDS[region];
+            
+            if (!normalData || !extremeData) return { category: 'Error', detail: `Datos de Altas Temperaturas (umbrales) no definidos para la región: ${region}.` };
+            
+            const zoneNormal = normalData[zona] ? normalData[zona][month] : null;
+            const zoneExtreme = extremeData[zona] ? extremeData[zona][month] : null;
+            
+            if (zoneNormal === null || zoneExtreme === null) return { category: 'Error', detail: `Umbrales no definidos para la Zona: ${zona} y Mes: ${month}.` };
+
+            const T_ALERTA = zoneNormal;
+            const T_ALARMA = zoneExtreme;
+
+            let category = 'Normal';
+            let color = 'bg-senapred-green';
+            let detail = `Umbral de Aviso/Alerta (Fuerte) es ${T_ALERTA}$^{\circ}C$. Umbral Extremo (Alarma) es ${T_ALARMA}^{\circ}C$.`;
+
+            if (value >= T_ALARMA) {
+                category = 'Extremo (Alarma)';
+                color = 'bg-senapred-red';
+                detail = `Supera el Umbral Extremo de ${T_ALARMA}^{\circ}C$. Evento Extremo de Altas Temperaturas. ${detail}`;
+            } else if (value >= T_ALERTA) {
+                category = 'Fuerte (Alerta)';
+                color = 'bg-senapred-orange';
+                detail = `Supera o iguala el Umbral de ${T_ALERTA}^{\circ}C$. Clasificado como Alerta Meteorológica. ${detail}`;
+            } else if (value >= T_ALERTA - 3) { // Asumiendo un rango moderado/aviso unos 3°C bajo el umbral de alerta (esto es una simplificación no explícita en el doc)
+                category = 'Moderado (Aviso)';
+                color = 'bg-senapred-yellow';
+                detail = `Por debajo del Umbral de Alerta, pero cercano al riesgo potencial. ${detail}`;
+            } else {
+                 category = 'Normal';
+                 color = 'bg-senapred-green';
+                 detail = `Por debajo del umbral de Aviso/Alerta (${T_ALERTA}^{\circ}C$). Condición normal para el mes de ${month}. ${detail}`;
+            }
+            
+            return { category, detail, color };
+        }
+
+        // --- 3. MANEJO DE EVENTOS Y UI ---
+
+        const regionSelect = document.getElementById('region');
+        const zonaSelect = document.getElementById('zona');
+        const variableSelect = document.getElementById('variable');
+        const generalValueContainer = document.getElementById('general-value-container');
+        const tempDateContainer = document.getElementById('temp-date-container');
+        const temperaturaMesSelect = document.getElementById('temperatura_mes');
+        const form = document.getElementById('meteorological-form');
+        const resultBox = document.getElementById('result-box');
+        const resultText = document.getElementById('result-text');
+        const resultDetail = document.getElementById('result-detail');
+        const resultContainer = document.getElementById('result-container');
+        const messageContainer = document.getElementById('message-container');
+        const messageText = document.getElementById('message-text');
+
+        /**
+         * Inicializa los desplegables de Región y Mes.
+         */
+        function initializeForm() {
+            // Cargar Regiones
+            const regions = Object.keys(METEO_DATA.REGIONS).sort();
+            regions.forEach(region => {
+                const option = document.createElement('option');
+                option.value = region;
+                option.textContent = region;
+                regionSelect.appendChild(option);
+            });
+            
+            // Cargar Meses (para Altas Temperaturas)
+            METEO_DATA.HIGH_TEMP_MONTHS.forEach(month => {
+                const option = document.createElement('option');
+                option.value = month;
+                option.textContent = month;
+                temperaturaMesSelect.appendChild(option);
+            });
+            // Seleccionar el mes de ENE por defecto
+            temperaturaMesSelect.value = 'ENE';
+        }
+        
+        /**
+         * Actualiza el desplegable de Zona basado en la Región seleccionada.
+         */
+        regionSelect.addEventListener('change', () => {
+            const selectedRegion = regionSelect.value;
+            const zonas = METEO_DATA.REGIONS[selectedRegion] || [];
+            
+            zonaSelect.innerHTML = '<option value="" disabled selected>Selecciona una zona</option>';
+            zonaSelect.disabled = zonas.length === 0;
+
+            if (zonas.length > 0) {
+                zonas.forEach(zona => {
+                    const option = document.createElement('option');
+                    option.value = zona;
+                    option.textContent = zona;
+                    zonaSelect.appendChild(option);
+                });
+            } else {
+                zonaSelect.innerHTML = '<option value="" disabled selected>No hay zonas definidas</option>';
+            }
+            
+            // Limpiar resultados anteriores
+            resultContainer.classList.add('hidden');
+        });
+        
+        /**
+         * Muestra/Oculta los campos de entrada de valor según la Variable seleccionada.
+         */
+        variableSelect.addEventListener('change', () => {
+            const variable = variableSelect.value;
+
+            // Resetear campos
+            generalValueContainer.classList.add('hidden');
+            tempDateContainer.classList.add('hidden');
+            
+            document.getElementById('general_valor').value = '';
+            document.getElementById('temperatura_valor').value = '';
+            
+            // Mostrar el campo de entrada correcto
+            if (variable === 'altas_temperaturas') {
+                tempDateContainer.classList.remove('hidden');
+            } else if (variable) {
+                generalValueContainer.classList.remove('hidden');
+                // Actualizar placeholder/label
+                const generalValorInput = document.getElementById('general_valor');
+                if (variable === 'precipitacion') {
+                    generalValorInput.placeholder = 'Ingresa el valor en mm';
+                } else if (variable === 'viento') {
+                    generalValorInput.placeholder = 'Ingresa el valor en km/h';
+                } else if (variable === 'heladas') {
+                    generalValorInput.placeholder = 'Ingresa la temperatura, ej: -4.5';
+                }
+            }
+             // Limpiar resultados anteriores
+            resultContainer.classList.add('hidden');
+            messageContainer.classList.add('hidden');
+        });
+
+        /**
+         * Maneja el envío del formulario para realizar el análisis.
+         */
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Ocultar resultados y mensajes previos
+            resultContainer.classList.add('hidden');
+            messageContainer.classList.add('hidden');
+            
+            const region = regionSelect.value;
+            const zona = zonaSelect.value;
+            const variable = variableSelect.value;
+            
+            if (!region || !zona || !variable) {
+                showMessage("Por favor, selecciona la Región, la Zona y la Variable.");
+                return;
+            }
+            
+            let value, month, result;
+            
+            if (variable === 'altas_temperaturas') {
+                value = parseFloat(document.getElementById('temperatura_valor').value);
+                month = temperaturaMesSelect.value;
+                if (isNaN(value)) { showMessage("Por favor, ingresa un valor numérico de Temperatura."); return; }
+                result = classifyHighTemp(region, zona, value, month);
+                
+            } else {
+                value = parseFloat(document.getElementById('general_valor').value);
+                if (isNaN(value)) { showMessage("Por favor, ingresa un valor numérico para la variable."); return; }
+
+                if (variable === 'heladas') {
+                    // La clasificación de heladas depende solo de la región, no de la zona.
+                    result = classifyFrost(region, value);
+                    
+                } else if (variable === 'precipitacion' || variable === 'viento') {
+                    // Clasificación de precipitación y viento
+                    // Si no hay datos, significa que la región no está completamente implementada
+                    const dataCheck = (variable === 'precipitacion' ? METEO_DATA.PRECIPITATION : METEO_DATA.WIND);
+                    if (!dataCheck[region] || !dataCheck[region][zona.toUpperCase()]) {
+                        showMessage(`La clasificación para ${variable} en la zona ${zona} de ${region} no está completamente implementada en el sistema. Vuelve a intentar con otra región/zona (ej: Atacama/Litoral para Precipitación/Viento, o Metropolitana/VALLE LONGITUDINAL para Altas Temperaturas).`);
+                        return;
+                    }
+                    result = classifyGeneral(region, zona, value, variable);
+                }
+            }
+            
+            // Mostrar resultado o error
+            if (result.category.startsWith('Error') || result.category.startsWith('No Clasificado')) {
+                showMessage(result.detail);
+                
+                // Forzar el estilo de error si la clasificación falla
+                resultBox.className = 'p-6 rounded-lg shadow-xl text-center category-Extremo transition duration-500 ease-in-out';
+                resultText.textContent = result.category;
+                resultDetail.textContent = result.detail;
+                resultContainer.classList.remove('hidden');
+                
+            } else {
+                displayResult(result);
+            }
+        });
+
+        /**
+         * Muestra un mensaje de error o advertencia.
+         */
+        function showMessage(text) {
+            messageText.textContent = text;
+            messageContainer.classList.remove('hidden');
+            resultContainer.classList.add('hidden');
+        }
+
+        /**
+         * Muestra el resultado de la clasificación en el contenedor de resultados.
+         */
+        function displayResult(result) {
+            resultContainer.classList.remove('hidden');
+            messageContainer.classList.add('hidden');
+            
+            // Limpiar clases de color anteriores
+            resultBox.className = 'p-6 rounded-lg text-white shadow-xl text-center transition duration-500 ease-in-out';
+            
+            // Asignar clase de color según categoría
+            let colorClass = '';
+            if (result.category.includes('Normal')) colorClass = 'category-Normal';
+            else if (result.category.includes('Moderado')) colorClass = 'category-Moderado';
+            else if (result.category.includes('Fuerte') || result.category.includes('Intensa')) colorClass = 'category-Fuerte'; // Fuerte e Intensa (Heladas)
+            else if (result.category.includes('Intenso') || result.category.includes('Extremo')) colorClass = 'category-Intenso'; // Intenso (Precip/Viento) o Extremo
+
+            resultBox.classList.add(colorClass);
+            
+            resultText.textContent = result.category;
+            resultDetail.textContent = result.detail;
+
+            // Ajuste especial para categorías Moderado (Amarillo) para mejor contraste
+             if (result.category.includes('Moderado')) {
+                resultBox.classList.remove('text-white');
+                resultBox.classList.add('text-gray-800');
+            } else {
+                resultBox.classList.remove('text-gray-800');
+                resultBox.classList.add('text-white');
+            }
+        }
+        
+        // Inicializar
+        initializeForm();
+
+    </script>
+</body>
+</html>
