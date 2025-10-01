@@ -99,7 +99,7 @@
         .group-header-subtitle-cell {
             background-color: #e5e7eb; /* Gris ligeramente más claro que el título del grupo */
             font-weight: normal; /* Menos peso visual */
-            font-size: 0.6rem; /* Aún más pequeño que text-xs (0.75rem) */
+            font-size: 0.6rem; /* text-[0.6rem] */
             color: #1f2937; /* text-gray-900 */
             text-align: center; 
             padding-left: 0.75rem;
@@ -129,25 +129,6 @@
         .weekend-bg {
             background-color: var(--color-weekend); 
             color: white;
-        }
-
-        /* Estilos de impresión */
-        @media print {
-            .no-print {
-                display: none !important;
-            }
-            body {
-                background-color: white !important;
-            }
-            .main-container {
-                box-shadow: none !important;
-                border: none !important;
-                padding: 0 !important;
-            }
-            .planning-grid-wrapper {
-                /* Asegura que la tabla no se corte horizontalmente, puede depender de la configuración de la impresora */
-                overflow-x: visible !important;
-            }
         }
 
         /* Modal Styles - Mantener el tamaño para buena UX */
@@ -184,7 +165,7 @@
         <div id="calendar-header" class="p-4 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-center bg-gray-50 rounded-t-xl no-print">
             <!-- Reducido el tamaño del título principal -->
             <h1 class="text-xl font-extrabold text-gray-800 mb-2 sm:mb-0">
-                Planificación Mensual de Pruebas <span class="text-blue-700 hidden sm:inline"></span>
+                Planificación Mensual de Pruebas de Enlaces Satelitales <span class="text-blue-700 hidden sm:inline"></span>
             </h1>
             <div class="flex items-center space-x-4">
                 <div id="month-navigation" class="flex items-center space-x-4">
@@ -200,14 +181,6 @@
             </div>
         </div>
         
-        <!-- Título para la impresión (oculto en pantalla, visible en impresión) -->
-        <div id="print-title" class="hidden print-title-style">
-            <h1 class="text-xl font-extrabold text-gray-800 p-4 text-center">
-                Planificación Mensual de Pruebas de Enlaces Satelitales
-            </h1>
-            <h2 id="print-month-year" class="text-lg font-bold text-gray-700 p-2 text-center"></h2>
-        </div>
-
         <!-- Contenedor principal de la matriz de planificación con scroll -->
         <div class="planning-grid-wrapper">
             <table class="planning-table w-full">
@@ -225,7 +198,7 @@
                 La fecha marcada en azul oscuro ($\blacksquare$) indica un día de prueba de enlaces satelitales programado para la región o autoridad correspondiente. Los fines de semana están marcados en color secundario (rojo/coral).
             </p>
             <p class="text-[0.65rem] text-red-500 mt-1">
-                *Datos de 2025 y 2026 son de ejemplo (mockup) basados en un patrón recurrente.
+                *Los datos de planificación se gestionan manualmente en el código JavaScript.
             </p>
         </div>
     </div>
@@ -244,7 +217,7 @@
                     <p><strong>Entidad:</strong> <span id="modal-region"></span></p>
                     <p><strong>Fecha:</strong> <span id="modal-date"></span></p>
                     <p class="text-sm italic mt-4 border-t pt-3">
-                        Integración Sharepoint: En una implementación real, este espacio mostraría datos en tiempo real (ej. link al documento PO-MAC-06, estado de la prueba, responsable, etc.) obtenidos vía API.
+                        UTA.
                     </p>
                 </div>
             </div>
@@ -253,7 +226,7 @@
 
     <!-- Script de JavaScript para la lógica del calendario -->
     <script>
-        // --- 1. CONFIGURACIÓN DE DATOS (Ampliación al 2026 y Mockup Recurrente) ---
+        // --- 1. CONFIGURACIÓN DE DATOS PARA PLANIFICACIÓN MANUAL ---
         const MONTH_NAMES = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
         
         // Rango de Planificación: Septiembre 2025 (8) a Diciembre 2026 (11)
@@ -262,28 +235,81 @@
         const START_YEAR = 2025;
         const END_YEAR = 2026; 
 
-        // Estructura de datos simplificada para el mockup, cubriendo ambos años.
-        const basePlanning = {
-            'Arica y Parinacota': [10, 27],
-            'Tarapacá': [11, 28],
-            'Antofagasta': [12, 29],
-            'Atacama': [13, 30],
-            'Coquimbo': [1, 14, 25],
-            'Valparaíso': [2, 15, 26],
-            'Metropolitana': [3, 16, 27],
-            "O'Higgins": [4, 17, 28],
-            'Maule': [5, 18, 29],
-            'Ñuble': [6, 19, 30],
-            'Biobío': [7, 20, 25],
-            'La Araucanía': [8, 21, 26],
-            'Los Ríos': [9, 22, 27],
-            'Los Lagos': [1, 23, 28],
-            'Aysén': [2, 24, 29],
-            'Magallanes': [3, 10, 30],
-            'Isla de Pascua - Rapa Nui': [1, 9, 26],
-            'Juan Fernández': [2, 10, 27],
-            'Director Nacional': [10, 20, 30],
-            'Jefe Depto Alerta T.': [11, 21, 29],
+        // Estructura de datos: [Año] -> [Mes (0=Enero, 11=Diciembre)] -> [Nombre de Región]: [Días Planificados]
+        const monthlyPlanningData = {
+            // AÑO 2025
+            2025: {
+                // Septiembre (Mes 8) - DATOS BASE DEL MOCKUP ORIGINAL
+                8: {
+                    'Arica y Parinacota': [10, 27],
+                    'Tarapacá': [11, 28],
+                    'Antofagasta': [12, 29],
+                    'Atacama': [13, 30],
+                    'Coquimbo': [1, 14, 25],
+                    'Valparaíso': [2, 15, 26],
+                    'Metropolitana': [3, 16, 27],
+                    "O'Higgins": [4, 17, 28],
+                    'Maule': [5, 18, 29],
+                    'Ñuble': [6, 19, 30],
+                    'Biobío': [7, 20, 25],
+                    'La Araucanía': [8, 21, 26],
+                    'Los Ríos': [9, 22, 27],
+                    'Los Lagos': [1, 23, 28],
+                    'Aysén': [2, 24, 29],
+                    'Magallanes': [3, 10, 30],
+                    'Isla de Pascua - Rapa Nui': [1, 9, 26],
+                    'Juan Fernández': [2, 10, 27],
+                    'Director Nacional': [10, 20, 30],
+                    'Jefe Depto Alerta T.': [11, 21, 29],
+                },
+                // Octubre (Mes 9) - DEBE LLENAR MANUALMENTE ESTOS DATOS
+                9: { 
+                    'Arica y Parinacota': [5, 19], 
+                    'Tarapacá': [6, 20],
+                    'Antofagasta': [7, 21],
+                    'Atacama': [8, 22],
+                    'Coquimbo': [9, 23],
+                    'Valparaíso': [10, 24],
+                    'Metropolitana': [11, 25],
+                    "O'Higgins": [12, 26],
+                    'Maule': [13, 27],
+                    'Ñuble': [14, 28],
+                    'Biobío': [1, 15],
+                    'La Araucanía': [2, 16],
+                    'Los Ríos': [3, 17],
+                    'Los Lagos': [4, 18],
+                    'Aysén': [5, 19],
+                    'Magallanes': [6, 20],
+                    'Isla de Pascua - Rapa Nui': [10, 20],
+                    'Juan Fernández': [11, 21],
+                    'Director Nacional': [15, 25],
+                    'Jefe Depto Alerta T.': [16, 26],
+                },
+                // Noviembre (Mes 10) - DEBE LLENAR MANUALMENTE ESTOS DATOS
+                10: { 
+                    'Arica y Parinacota': [1, 15], 
+                    // ... (Complete el resto de las 22 entidades para Noviembre 2025)
+                },
+                // Diciembre (Mes 11) - DEBE LLENAR MANUALMENTE ESTOS DATOS
+                11: {
+                    // ... (Complete el resto de las 22 entidades para Diciembre 2025)
+                },
+            },
+            // AÑO 2026 - DEBE LLENAR MANUALMENTE ESTOS DATOS
+            2026: {
+                0: {}, // Enero
+                1: {}, // Febrero
+                2: {}, // Marzo
+                3: {}, // Abril
+                4: {}, // Mayo
+                5: {}, // Junio
+                6: {}, // Julio
+                7: {}, // Agosto
+                8: {}, // Septiembre
+                9: {}, // Octubre
+                10: {}, // Noviembre
+                11: {}, // Diciembre
+            }
         };
 
         const regions = [
@@ -329,12 +355,17 @@
             const todayYear = currentDate.getFullYear();
             const todayMonth = currentDate.getMonth();
 
-            if (todayYear === START_YEAR && todayMonth >= START_MONTH) {
-                currentMonth = todayMonth;
-                currentYear = todayYear;
-            } else if (todayYear === END_YEAR && todayMonth <= END_MONTH) {
-                currentMonth = todayMonth;
-                currentYear = todayYear;
+            if (todayYear >= START_YEAR && todayYear <= END_YEAR) {
+                if (todayYear === START_YEAR && todayMonth < START_MONTH) {
+                    currentMonth = START_MONTH;
+                    currentYear = START_YEAR;
+                } else if (todayYear === END_YEAR && todayMonth > END_MONTH) {
+                    currentMonth = END_MONTH;
+                    currentYear = END_YEAR;
+                } else {
+                    currentMonth = todayMonth;
+                    currentYear = todayYear;
+                }
             } else if (todayYear > END_YEAR) {
                 currentMonth = END_MONTH;
                 currentYear = END_YEAR;
@@ -345,20 +376,14 @@
         }
         
         /**
-         * Aplica un desplazamiento periódico al día de planificación basado en el mes y año (mockup).
+         * Obtiene los días planificados directamente del objeto monthlyPlanningData sin recurrencia.
          */
         function getScheduledDays(regionName, month, year) {
-            const totalMonthsFromStart = (year - START_YEAR) * 12 + month - START_MONTH;
-            const daysOffset = totalMonthsFromStart % 4; // Desplazamiento periódico de 4 meses
-
-            const baseDays = basePlanning[regionName] || [];
+            const yearData = monthlyPlanningData[year] || {};
+            const monthData = yearData[month] || {};
             
-            return baseDays.map(day => {
-                let newDay = day + daysOffset;
-                // Asegurar que no exceda el número de días en el mes (no es perfecto, es mockup)
-                if (newDay > 30) newDay = newDay - 30;
-                return newDay;
-            }).filter(d => d > 0);
+            // Devuelve la lista de días para esa región, o un arreglo vacío si no existe.
+            return monthData[regionName] || [];
         }
 
         /**
@@ -394,11 +419,6 @@
             document.getElementById('event-modal-overlay').style.display = 'none';
         }
         
-        /**
-         * Se elimina la función printCalendar() y el botón del HTML.
-         */
-        
-
         /**
          * Renderiza la matriz de planificación.
          */
@@ -464,6 +484,7 @@
                 const isEvenRow = index % 2 === 0;
                 const rowBg = isEvenRow ? 'bg-white' : 'bg-gray-50'; // Zebra-striping
                 
+                // Obtiene los días planificados para el mes y año actuales.
                 const scheduledDays = getScheduledDays(item.name, currentMonth, currentYear);
 
                 if (item.type === 'header') {
