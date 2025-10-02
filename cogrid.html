@@ -1,0 +1,171 @@
+<!--
+  Diagrama de Círculos Jerárquicos OCHA - CON ANIMACIÓN
+  Diseño visual que representa al comité como un grupo unificado, con los roles
+  dispuestos jerárquicamente. Se añade el CONGRID 19 y animaciones sutiles.
+  Utiliza la paleta de colores de OCHA y Tailwind CSS.
+-->
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  /* Paleta de Colores OCHA */
+  :root {
+    --ocha-blue: #418FDE; /* Azul UN/Primary */
+    --ocha-salmon: #E56A54; /* Salmón/Accent */
+    --ocha-light-blue: #D4E5F7; /* Azul claro para fondos */
+    --ocha-text-dark: #383838;
+  }
+  .member-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: default;
+    /* Animación inicial sutil */
+    opacity: 0;
+    animation: fadeIn 0.8s ease-out forwards;
+  }
+  .member-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Keyframes para la animación de entrada */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Animación para el círculo central (pulsante) */
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(65, 143, 222, 0.5); }
+    70% { box-shadow: 0 0 0 10px rgba(65, 143, 222, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(65, 143, 222, 0); }
+  }
+  
+  .center-pulse {
+    animation: pulse 2s infinite, fadeIn 0.8s ease-out forwards;
+    animation-delay: 0.5s;
+    opacity: 0;
+    background-color: var(--ocha-blue) !important; /* Usamos el azul primario aquí */
+  }
+
+  /* Retrasos escalonados para las tarjetas */
+  .member-card:nth-child(1) { animation-delay: 1.0s; }
+  .member-card:nth-child(2) { animation-delay: 1.1s; }
+  .member-card:nth-child(3) { animation-delay: 1.2s; }
+  .member-card:nth-child(4) { animation-delay: 1.3s; }
+  .member-card:nth-child(5) { animation-delay: 1.4s; }
+  .member-card:nth-child(6) { animation-delay: 1.5s; }
+  /* Puedes seguir añadiendo más retrasos si lo deseas */
+
+</style>
+
+<div class="p-6 md:p-10 bg-gray-50 rounded-lg shadow-xl font-sans" style="font-family: Arial, sans-serif;">
+  <header class="text-center mb-8">
+    <h1 class="text-3xl font-extrabold text-[var(--ocha-text-dark)] mb-2">
+      Composición del <span class="text-[var(--ocha-blue)]">Comité Nacional</span>
+    </h1>
+    <p class="text-lg text-gray-600">Representación visual de los integrantes clave.</p>
+  </header>
+
+  <!-- Contenedor del Diagrama -->
+  <div class="flex flex-col items-center">
+    <!-- Círculo Central/Nodo Principal -->
+    <div class="center-pulse bg-[var(--ocha-salmon)] text-white w-48 h-48 flex items-center justify-center rounded-full text-center p-4 shadow-lg mb-8">
+      <h2 class="text-xl font-bold uppercase tracking-wider">
+        Comité Nacional
+      </h2>
+    </div>
+
+    <!-- Flechas y línea divisoria -->
+    <div class="w-1 h-12 bg-gray-300 rounded-full mb-8" style="animation: fadeIn 0.8s ease-out forwards; animation-delay: 0.9s; opacity: 0;"></div>
+
+    <!-- Miembros Superiores/Jefes de Cartera (Grid Responsive) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-5xl">
+
+      <div class="member-card bg-white p-4 rounded-xl border-t-4 border-[var(--ocha-blue)] text-center shadow">
+        <p class="text-xs font-bold uppercase" style="color: var(--ocha-salmon);">CONGRID 1</p>
+        <h3 class="text-base font-semibold mt-1" style="color: var(--ocha-text-dark);">MINISTRO DEL INTERIOR Y SEGURIDAD PÚBLICA</h3>
+      </div>
+      
+      <!-- NUEVO MIEMBRO CONGRID 19 -->
+      <div class="member-card bg-white p-4 rounded-xl border-t-4 border-[var(--ocha-blue)] text-center shadow">
+        <p class="text-xs font-bold uppercase" style="color: var(--ocha-salmon);">CONGRID 19</p>
+        <h3 class="text-base font-semibold mt-1" style="color: var(--ocha-text-dark);">MINISTERIO DE SEGURIDAD PÚBLICA</h3>
+      </div>
+      <!-- FIN NUEVO MIEMBRO CONGRID 19 -->
+      
+      <div class="member-card bg-white p-4 rounded-xl border-t-4 border-[var(--ocha-blue)] text-center shadow">
+        <p class="text-xs font-bold uppercase" style="color: var(--ocha-salmon);">CONGRID 3</p>
+        <h3 class="text-base font-semibold mt-1" style="color: var(--ocha-text-dark);">MINISTRO DE DEFENSA NACIONAL</h3>
+      </div>
+      <div class="member-card bg-white p-4 rounded-xl border-t-4 border-[var(--ocha-blue)] text-center shadow">
+        <p class="text-xs font-bold uppercase" style="color: var(--ocha-salmon);">CONGRID 11</p>
+        <h3 class="text-base font-semibold mt-1" style="color: var(--ocha-text-dark);">MINISTRO DE HACIENDA</h3>
+      </div>
+      <div class="member-card bg-white p-4 rounded-xl border-t-4 border-[var(--ocha-blue)] text-center shadow">
+        <p class="text-xs font-bold uppercase" style="color: var(--ocha-salmon);">CONGRID 12</p>
+        <h3 class="text-base font-semibold mt-1" style="color: var(--ocha-text-dark);">MINISTRO DE EDUCACIÓN</h3>
+      </div>
+      <div class="member-card bg-white p-4 rounded-xl border-t-4 border-[var(--ocha-blue)] text-center shadow">
+        <p class="text-xs font-bold uppercase" style="color: var(--ocha-salmon);">CONGRID 8</p>
+        <h3 class="text-base font-semibold mt-1" style="color: var(--ocha-text-dark);">MINISTRO DE OBRAS PÚBLICAS</h3>
+      </div>
+      <div class="member-card bg-white p-4 rounded-xl border-t-4 border-[var(--ocha-blue)] text-center shadow">
+        <p class="text-xs font-bold uppercase" style="color: var(--ocha-salmon);">CONGRID 10</p>
+        <h3 class="text-base font-semibold mt-1" style="color: var(--ocha-text-dark);">MINISTRO DE SALUD</h3>
+      </div>
+      <div class="member-card bg-white p-4 rounded-xl border-t-4 border-[var(--ocha-blue)] text-center shadow">
+        <p class="text-xs font-bold uppercase" style="color: var(--ocha-salmon);">CONGRID 13</p>
+        <h3 class="text-base font-semibold mt-1" style="color: var(--ocha-text-dark);">MINISTRO DE VIVIENDA Y URBANISMO</h3>
+      </div>
+      <div class="member-card bg-white p-4 rounded-xl border-t-4 border-[var(--ocha-blue)] text-center shadow">
+        <p class="text-xs font-bold uppercase" style="color: var(--ocha-salmon);">CONGRID 14</p>
+        <h3 class="text-base font-semibold mt-1" style="color: var(--ocha-text-dark);">MINISTRO DE AGRICULTURA</h3>
+      </div>
+      <div class="member-card bg-white p-4 rounded-xl border-t-4 border-[var(--ocha-blue)] text-center shadow">
+        <p class="text-xs font-bold uppercase" style="color: var(--ocha-salmon);">CONGRID 9</p>
+        <h3 class="text-base font-semibold mt-1" style="color: var(--ocha-text-dark);">MINISTRO DE TRANSPORTES Y TELECOMUNICACIONES</h3>
+      </div>
+      <div class="member-card bg-white p-4 rounded-xl border-t-4 border-[var(--ocha-blue)] text-center shadow">
+        <p class="text-xs font-bold uppercase" style="color: var(--ocha-salmon);">CONGRID 7</p>
+        <h3 class="text-base font-semibold mt-1" style="color: var(--ocha-text-dark);">MINISTRO DE ENERGÍA</h3>
+      </div>
+      <div class="member-card bg-white p-4 rounded-xl border-t-4 border-[var(--ocha-blue)] text-center shadow">
+        <p class="text-xs font-bold uppercase" style="color: var(--ocha-salmon);">CONGRID 15</p>
+        <h3 class="text-base font-semibold mt-1" style="color: var(--ocha-text-dark);">MINISTRO DE MEDIO AMBIENTE</h3>
+      </div>
+      <div class="member-card bg-white p-4 rounded-xl border-t-4 border-[var(--ocha-blue)] text-center shadow">
+        <p class="text-xs font-bold uppercase" style="color: var(--ocha-salmon);">CONGRID 2</p>
+        <h3 class="text-base font-semibold mt-1" style="color: var(--ocha-text-dark);">SUBSECRETARIO DEL INTERIOR</h3>
+      </div>
+      <div class="member-card bg-white p-4 rounded-xl border-t-4 border-[var(--ocha-blue)] text-center shadow">
+        <p class="text-xs font-bold uppercase" style="color: var(--ocha-salmon);">CONGRID 4</p>
+        <h3 class="text-base font-semibold mt-1" style="color: var(--ocha-text-dark);">JEFE DEL ESTADO MAYOR CONJUNTO</h3>
+      </div>
+      <div class="member-card bg-white p-4 rounded-xl border-t-4 border-[var(--ocha-blue)] text-center shadow">
+        <p class="text-xs font-bold uppercase" style="color: var(--ocha-salmon);">CONGRID 5</p>
+        <h3 class="text-base font-semibold mt-1" style="color: var(--ocha-text-dark);">GENERAL DIRECTOR DE CARABINEROS DE CHILE</h3>
+      </div>
+      <div class="member-card bg-white p-4 rounded-xl border-t-4 border-[var(--ocha-blue)] text-center shadow">
+        <p class="text-xs font-bold uppercase" style="color: var(--ocha-salmon);">CONGRID 6</p>
+        <h3 class="text-base font-semibold mt-1" style="color: var(--ocha-text-dark);">DIRECTOR GENERAL DE LA PDI</h3>
+      </div>
+      <div class="member-card bg-white p-4 rounded-xl border-t-4 border-[var(--ocha-blue)] text-center shadow">
+        <p class="text-xs font-bold uppercase" style="color: var(--ocha-salmon);">CONGRID 16</p>
+        <h3 class="text-base font-semibold mt-1" style="color: var(--ocha-text-dark);">PRESIDENTE DE LA JUNTA NACIONAL DE BOMBEROS</h3>
+      </div>
+      <div class="member-card bg-white p-4 rounded-xl border-t-4 border-[var(--ocha-blue)] text-center shadow">
+        <p class="text-xs font-bold uppercase" style="color: var(--ocha-salmon);">CONGRID 17</p>
+        <h3 class="text-base font-semibold mt-1" style="color: var(--ocha-text-dark);">MINISTRO DE DESARROLLO SOCIAL Y FAMILIA</h3>
+      </div>
+      <div class="member-card bg-white p-4 rounded-xl border-t-4 border-[var(--ocha-blue)] text-center shadow">
+        <p class="text-xs font-bold uppercase" style="color: var(--ocha-salmon);">CONGRID 18</p>
+        <h3 class="text-base font-semibold mt-1" style="color: var(--ocha-text-dark);">MINISTRA DE LA MUJER Y EQUIDAD DE GÉNERO</h3>
+      </div>
+
+    </div>
+  </div>
+</div>
