@@ -51,6 +51,20 @@
   .card--2{ background:var(--c2) }
   .card--3{ background:var(--c3) }
   .card--4{ background:var(--c4) }
+
+/* Justificar texto en los 4 cards */
+/* Justificar el texto de los párrafos dentro de cada card */
+  .card--1 p,
+  .card--2 p,
+  .card--3 p,
+  .card--4 p{
+    text-align: justify;          /* alineación en bloque */
+    text-justify: inter-word;     /* distribución por palabras */
+    hyphens: auto;                /* guionado automático (lang="es") */
+    -webkit-hyphens: auto;
+    -ms-hyphens: auto;
+    line-height: 1.45;            /* mejora la legibilidad en texto justificado */
+  }
 </style>
 </head>
 <body>
