@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Unidades SAT (top aligned)</title>
+<title>Unidades SAT (1 fila)</title>
 <meta name="color-scheme" content="light dark">
 <style>
   :root{
@@ -15,36 +15,40 @@
   *{box-sizing:border-box}
   body{
     margin:0; background:var(--bg); color:var(--ink);
-    font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans","Apple Color Emoji","Segoe UI Emoji";
+    font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans";
   }
 
-  .container{ width:100%; padding:16px 12px 24px }
+  .container{ width:100%; padding:8px 10px 16px }
 
-  /* Grid a todo el ancho */
+  /* Grid: en desktop SIEMPRE 4 columnas (una sola fila) */
   .grid{
-    display:grid; gap:16px;
-    grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); /* ↑ antes 260px */
+    display:grid; gap:12px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     align-items:stretch;
   }
+  /* Responsive (por si se ve en móvil) */
+  @media (max-width: 1024px){
+    .grid{ grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 560px){
+    .grid{ grid-template-columns: 1fr; }
+  }
 
-  /* Tarjetas alineadas arriba */
+  /* Tarjetas más “angostas” */
   .card{
-    min-height:180px;
+    min-height:150px;                 /* ↓ antes 180 */
     border-radius:var(--radius);
-    padding:20px;
-    display:flex;
-    flex-direction:column;
-    justify-content:flex-start;
-    align-items:flex-start;
-    gap:10px;
-    color:#fff;
-    box-shadow:var(--shadow);
+    padding:16px;                     /* ↓ antes 20 */
+    display:flex; flex-direction:column;
+    justify-content:flex-start; align-items:flex-start;
+    gap:8px;                          /* ↓ antes 10 */
+    color:#fff; box-shadow:var(--shadow);
     transition:transform .12s ease, box-shadow .12s ease;
     outline:none; text-decoration:none; cursor:default;
   }
-  .card h2{ margin:0; font-size:20px; font-weight:800; letter-spacing:.2px }
-  .card p { margin:0; font-size:14px }
-  .card:hover{ transform:translateY(-4px); box-shadow:0 16px 30px rgba(2,6,23,.12),0 6px 10px rgba(2,6,23,.08) }
+  .card h2{ margin:0; font-size:18px; font-weight:800; letter-spacing:.2px } /* ↓ 20px */
+  .card p  { margin:0; font-size:13px }                                       /* ↓ 14px */
+  .card:hover{ transform:translateY(-3px); box-shadow:0 16px 30px rgba(2,6,23,.12),0 6px 10px rgba(2,6,23,.08) }
   .card:focus-visible{ outline:3px solid #93c5fd; outline-offset:3px }
 
   .card--1{ background:var(--c1) }
@@ -52,39 +56,36 @@
   .card--3{ background:var(--c3) }
   .card--4{ background:var(--c4) }
 
-  /* ✅ Justificado sin cortar palabras */
-  .card--1 p,
-  .card--2 p,
-  .card--3 p,
-  .card--4 p{
+  /* Justificado SIN cortar palabras */
+  .card--1 p, .card--2 p, .card--3 p, .card--4 p{
     text-align: justify;
     text-justify: inter-word;
-    hyphens: none;
-    -webkit-hyphens: none;
-    -ms-hyphens: none;
-    word-break: normal;
-    overflow-wrap: normal;
-    text-align-last: left;
-    line-height: 1.45;
+    hyphens: none; -webkit-hyphens: none; -ms-hyphens: none;
+    word-break: normal; overflow-wrap: normal;
+    text-align-last: left; line-height: 1.45;
   }
 </style>
 </head>
 <body>
   <main class="container" aria-labelledby="titulo-modulos">
     <h2 id="titulo-modulos" style="position:absolute;left:-9999px">Módulos del Sistema</h2>
+
     <section class="grid" aria-label="Módulos del Sistema de Alerta Temprana">
       <article class="card card--1" tabindex="0">
         <h2>Unidades de Alerta Temprana</h2>
         <p>Encargadas de monitorear los riesgos, declarar alertas y difundir información oportuna a la población para prevenir daños.</p>
       </article>
+
       <article class="card card--2" tabindex="0">
         <h2>Organismos Técnicos de Monitoreo</h2>
         <p>Son los encargados de vigilar y alertar sobre fenómenos específicos que pueden convertirse en desastres, a través de sus propias redes de observación e información.</p>
       </article>
+
       <article class="card card--3" tabindex="0">
         <h2>Sistema Nacional de Comunicaciones</h2>
         <p>Es un elemento clave del Sistema de Alerta Temprana y tiene por objetivo asegurar la comunicación fluida y oportuna entre las instituciones pertinentes durante una emergencia.</p>
       </article>
+
       <article class="card card--4" tabindex="0">
         <h2>Perímetro de Seguridad</h2>
         <p>Es una acción operativa que se implementa durante una emergencia. SENAPRED coordina y supervisa la gestión del riesgo de desastres a nivel nacional, y las acciones operativas en terreno, como el establecimiento de un perímetro de seguridad, son responsabilidad de las autoridades locales a cargo del operativo.</p>
