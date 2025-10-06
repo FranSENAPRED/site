@@ -20,30 +20,30 @@
 
   .container{ width:100%; padding:16px 12px 24px }
 
-  /* Grid que ocupa todo el ancho disponible */
+  /* Grid a todo el ancho */
   .grid{
     display:grid; gap:16px;
-    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-    align-items:stretch; /* todas las tarjetas con la misma altura */
+    grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); /* ↑ antes 260px */
+    align-items:stretch;
   }
 
-  /* Tarjetas alineadas ARRIBA */
+  /* Tarjetas alineadas arriba */
   .card{
     min-height:180px;
     border-radius:var(--radius);
     padding:20px;
     display:flex;
     flex-direction:column;
-    justify-content:flex-start;  /* <- arriba */
-    align-items:flex-start;      /* <- izquierda */
-    gap:10px;                    /* espacio entre elementos */
+    justify-content:flex-start;
+    align-items:flex-start;
+    gap:10px;
     color:#fff;
     box-shadow:var(--shadow);
     transition:transform .12s ease, box-shadow .12s ease;
     outline:none; text-decoration:none; cursor:default;
   }
   .card h2{ margin:0; font-size:20px; font-weight:800; letter-spacing:.2px }
-  .card p { margin:0; opacity:.92; font-size:14px }
+  .card p { margin:0; font-size:14px }
   .card:hover{ transform:translateY(-4px); box-shadow:0 16px 30px rgba(2,6,23,.12),0 6px 10px rgba(2,6,23,.08) }
   .card:focus-visible{ outline:3px solid #93c5fd; outline-offset:3px }
 
@@ -52,18 +52,20 @@
   .card--3{ background:var(--c3) }
   .card--4{ background:var(--c4) }
 
-/* Justificar texto en los 4 cards */
-/* Justificar el texto de los párrafos dentro de cada card */
+  /* ✅ Justificado sin cortar palabras */
   .card--1 p,
   .card--2 p,
   .card--3 p,
   .card--4 p{
-    text-align: justify;          /* alineación en bloque */
-    text-justify: inter-word;     /* distribución por palabras */
-    hyphens: auto;                /* guionado automático (lang="es") */
-    -webkit-hyphens: auto;
-    -ms-hyphens: auto;
-    line-height: 1.45;            /* mejora la legibilidad en texto justificado */
+    text-align: justify;
+    text-justify: inter-word;
+    hyphens: none;
+    -webkit-hyphens: none;
+    -ms-hyphens: none;
+    word-break: normal;
+    overflow-wrap: normal;
+    text-align-last: left;
+    line-height: 1.45;
   }
 </style>
 </head>
@@ -77,15 +79,15 @@
       </article>
       <article class="card card--2" tabindex="0">
         <h2>Organismos Técnicos de Monitoreo</h2>
-        <p>Son los encargados de vigilar y alertar sobre fenómenos específicos que pueden convertirse en desastres, a través de sus propias redes de observación e información</p>
+        <p>Son los encargados de vigilar y alertar sobre fenómenos específicos que pueden convertirse en desastres, a través de sus propias redes de observación e información.</p>
       </article>
       <article class="card card--3" tabindex="0">
         <h2>Sistema Nacional de Comunicaciones</h2>
-        <p>Es un elemento clave Del Sistema de Alerta Temprana, y tiene por objetivo asegurar la comunicación fluida y oportuna entre las instituciones pertinentes durante una emergencia.</p>
+        <p>Es un elemento clave del Sistema de Alerta Temprana y tiene por objetivo asegurar la comunicación fluida y oportuna entre las instituciones pertinentes durante una emergencia.</p>
       </article>
       <article class="card card--4" tabindex="0">
         <h2>Perímetro de Seguridad</h2>
-        <p>Es una acción operativa que se implementa durante una emergencia. SENAPRED coordina y supervisa la gestión del riesgo de desastres a nivel nacional, y las acciones operativas en terreno, como el establecimiento de un perímetro de seguridad son responsabilidad de las autoridades locales a cargo del operativo.</p>
+        <p>Es una acción operativa que se implementa durante una emergencia. SENAPRED coordina y supervisa la gestión del riesgo de desastres a nivel nacional, y las acciones operativas en terreno, como el establecimiento de un perímetro de seguridad, son responsabilidad de las autoridades locales a cargo del operativo.</p>
       </article>
     </section>
   </main>
