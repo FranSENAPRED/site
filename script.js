@@ -14,7 +14,7 @@ const grid = document.querySelector(".grid");
 grid.innerHTML = cards.map(c => `
   <article class="card">
     <div class="card__top">
-      <div class="badge">${c.icon}</div>
+      <div class="badge" aria-hidden="true">${c.icon}</div>
       <div class="value">${c.value}</div>
     </div>
     <div class="label">${c.label}</div>
