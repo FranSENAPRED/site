@@ -28,10 +28,9 @@ body{
   background: var(--bg);
 }
 
-.container{
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 18px;
+.container.dashboard-only {
+  min-height: auto;
+  padding: 24px 24px 16px;
 }
 
 .dashboard-only{
