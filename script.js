@@ -1,6 +1,6 @@
 const cards = [
-  { icon:"🕊️", value:"21", label:"Personas fallecidas", detail:"PDI" },
-  { icon:"🏥", value:"330", label:"Personas lesionadas", detail:"SENAPRED-MINSAL" },
+  { icon:"🕊️", value:"21", label:"Personas fallecidas", detail:"Informado por PDI" },
+  { icon:"🏥", value:"330", label:"Personas lesionadas", detail:"Informado por SENAPRED-MINSAL" },
   { icon:"👥", value:"21.712", label:"Personas damnificadas", detail:"394 personas albergadas" },
   { icon:"📢", value:"214", label:"Mensajes SAE enviados", detail:"Desde el 17/01/2026" },
   { icon:"🏚️", value:"3.074", label:"Viviendas destruidas", detail:"FIBE" },
