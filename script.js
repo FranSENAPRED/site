@@ -1,9 +1,9 @@
 const cards = [
-  { icon:"🔔", value:"7", label:"Regiones con alertas", detail:"1 Roja, 2 Amarilla y 4 Temprana Preventiva" },
-  { icon:"🔥", value:"65", label:"Incendios activos", detail:"20 en combate, 33 controlados y 12 extinguidos" },
+  { icon:"🔔", value:"6", label:"Regiones con alertas", detail:"1 Roja, 2 Amarilla y 3 Temprana Preventiva" },
+  { icon:"🔥", value:"43", label:"Incendios activos", detail:"10 en combate, 32 controlados y 1 extinguidos" },
   { icon:"📢", value:"214", label:"Mensajes SAE enviados", detail:"Desde el 17/01/2026" },
   { icon:"📋", value:"3.074", label:"FIBE", detail:"Hogares con ficha terminada" },
-  { icon:"👥", value:"21.698", label:"Personas damnificadas", detail:"341 personas albergadas" },
+  { icon:"👥", value:"21.712", label:"Personas damnificadas", detail:"394 personas albergadas" },
   { icon:"🚁", value:"140", label:"Aeronaves desplegadas", detail:"CONAF, SENAPRED, EMCO y empresas forestales" },
   { icon:"👩‍🚒", value:"+4.900", label:"Bomberos movilizados", detail:"Recursos de respuesta y combate" },
   { icon:"🤝", value:"1.303", label:"Voluntarios desplegados", detail:"Apoyo humanitario y rehabilitación" }
