@@ -1,0 +1,515 @@
+<!-- dmc.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monitor DMC - SENAPRED</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Leaflet -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body { font-family: 'Open Sans', sans-serif; background:#f3f4f6; }
+    #map { height: 620px; width: 100%; border-radius: 0.75rem; }
+    .loader { border-top-color: #2563eb; animation: spin 1.1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .border-l-aviso { border-left: 6px solid #f1c40f; }
+    .border-l-alerta { border-left: 6px solid #e67e22; }
+    .border-l-alarma { border-left: 6px solid #c0392b; }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col">
+  <!-- Header -->
+  <header class="bg-white shadow sticky top-0 z-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <img
+          class="h-12 w-auto"
+          src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Logotipo_SENAPRED.svg/1200px-Logotipo_SENAPRED.svg.png"
+          alt="SENAPRED"
+        />
+        <div class="hidden sm:block border-l-2 border-gray-200 pl-4">
+          <div class="text-lg font-bold text-slate-800 leading-tight">
+            Sistema Nacional de<br/>Alertas Meteorológicas (DMC)
+          </div>
+          <div class="text-xs text-gray-500">Visor web (GeoJSON)</div>
+        </div>
+      </div>
+
+      <div class="text-right text-xs text-gray-500">
+        <div>Fuente: Dirección Meteorológica de Chile</div>
+        <div id="last-update" class="mt-1">Actualizando…</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6">
+    <!-- Controls -->
+    <section class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6 flex flex-wrap gap-4 items-end">
+      <div class="w-full md:w-1/3">
+        <label class="block text-sm font-semibold text-gray-700 mb-1">Región</label>
+        <select id="region-filter" class="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          <option value="Todas">Todas</option>
+        </select>
+      </div>
+
+      <div class="w-full md:w-1/3">
+        <label class="block text-sm font-semibold text-gray-700 mb-1">Acción</label>
+        <button id="btn-refresh" class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-md py-2 px-4 text-sm font-semibold transition">
+          🔄 Actualizar datos
+        </button>
+      </div>
+
+      <div id="loading" class="hidden flex items-center gap-2 text-blue-700 text-sm font-semibold">
+        <div class="loader rounded-full border-4 border-t-4 border-gray-200 h-5 w-5"></div>
+        Cargando…
+      </div>
+
+      <div id="status" class="w-full text-sm mt-2 hidden"></div>
+    </section>
+
+    <!-- KPIs -->
+    <section class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 border-l-aviso">
+        <div class="text-sm text-gray-500 font-semibold">Avisos</div>
+        <div id="kpi-aviso" class="text-3xl font-extrabold text-slate-900 mt-1">0</div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 border-l-alerta">
+        <div class="text-sm text-gray-500 font-semibold">Alertas</div>
+        <div id="kpi-alerta" class="text-3xl font-extrabold text-slate-900 mt-1">0</div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 border-l-alarma">
+        <div class="text-sm text-gray-500 font-semibold">Alarmas</div>
+        <div id="kpi-alarma" class="text-3xl font-extrabold text-slate-900 mt-1">0</div>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 border-l-4 border-gray-400">
+        <div class="text-sm text-gray-500 font-semibold">Total (eventos únicos)</div>
+        <div id="kpi-total" class="text-3xl font-extrabold text-slate-900 mt-1">0</div>
+      </div>
+    </section>
+
+    <!-- Panels -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Left: Chart + Table -->
+      <div class="lg:col-span-1 flex flex-col gap-6">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+          <div class="text-lg font-bold text-slate-800 mb-3">Distribución por severidad</div>
+          <div class="h-64">
+            <canvas id="chart"></canvas>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex-grow">
+          <div class="text-lg font-bold text-slate-800 mb-3">Últimos eventos</div>
+          <div class="overflow-auto max-h-[420px]">
+            <table class="min-w-full text-xs text-left">
+              <thead class="bg-gray-50 sticky top-0">
+                <tr>
+                  <th class="px-2 py-2 text-gray-500 font-semibold">Tipo</th>
+                  <th class="px-2 py-2 text-gray-500 font-semibold">Región</th>
+                  <th class="px-2 py-2 text-gray-500 font-semibold">Fenómeno</th>
+                </tr>
+              </thead>
+              <tbody id="tbody" class="divide-y divide-gray-100"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Map -->
+      <div class="lg:col-span-2">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-2 relative">
+          <div id="map"></div>
+
+          <div class="absolute bottom-5 right-5 bg-white/90 backdrop-blur p-3 rounded-lg shadow text-xs z-[500]">
+            <div class="font-bold mb-2">Simbología</div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="w-3 h-3 rounded-full" style="background:#f1c40f;"></span> Aviso
+            </div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="w-3 h-3 rounded-full" style="background:#e67e22;"></span> Alerta
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full" style="background:#c0392b;"></span> Alarma
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Note (important for GitHub Pages) -->
+    <section class="mt-6">
+      <div class="bg-blue-50 border border-blue-200 text-blue-900 rounded-xl p-4 text-sm">
+        <div class="font-bold mb-1">Nota importante (CORS)</div>
+        <div>
+          Este visor consume un GeoJSON desde Google Cloud Storage usando <code>fetch()</code>.
+          Si el bucket no tiene CORS habilitado para tu dominio de GitHub Pages, el navegador bloqueará la lectura.
+          Soluciones: (1) habilitar CORS en el bucket, o (2) usar un proxy (Cloud Run/Function).
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bg-slate-900 text-white py-6 mt-8">
+    <div class="max-w-7xl mx-auto px-4 text-center text-sm">
+      <div>&copy; 2026 SENAPRED</div>
+      <div class="text-slate-400 mt-1">Visor web para monitoreo de Avisos, Alertas y Alarmas (DMC).</div>
+    </div>
+  </footer>
+
+  <script>
+    // ==============================
+    // CONFIG
+    // ==============================
+    // ⚠️ Si al publicarlo en GitHub Pages no carga: es CORS del bucket.
+    // Si usas un proxy, cambia esta URL a tu endpoint.
+    const DATA_URL = "https://storage.googleapis.com/geodata-dmc-events-bucket/eventos_AAA_fusionados_ordenados.geojson";
+
+    let rawData = null;
+    let map = null;
+    let geoLayer = null;
+    let chart = null;
+
+    // ==============================
+    // INIT
+    // ==============================
+    document.addEventListener("DOMContentLoaded", () => {
+      initMap();
+      document.getElementById("btn-refresh").addEventListener("click", fetchData);
+      fetchData();
+    });
+
+    // ==============================
+    // UI helpers
+    // ==============================
+    function setStatus(type, message) {
+      const el = document.getElementById("status");
+      el.classList.remove("hidden");
+      el.className = "w-full text-sm mt-2 rounded-md px-3 py-2";
+
+      if (type === "ok") el.classList.add("bg-green-50", "border", "border-green-200", "text-green-900");
+      if (type === "warn") el.classList.add("bg-yellow-50", "border", "border-yellow-200", "text-yellow-900");
+      if (type === "error") el.classList.add("bg-red-50", "border", "border-red-200", "text-red-900");
+
+      el.innerHTML = message;
+    }
+
+    function clearStatus() {
+      const el = document.getElementById("status");
+      el.classList.add("hidden");
+      el.innerHTML = "";
+    }
+
+    // ==============================
+    // MAP
+    // ==============================
+    function initMap() {
+      map = L.map("map").setView([-35.6751, -71.5430], 4);
+
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: "abcd",
+        maxZoom: 19,
+      }).addTo(map);
+    }
+
+    function normProps(p = {}) {
+      return {
+        tipo: p.tipo ?? p.nivel ?? p.severidad ?? "",
+        codigoMeteo: p.codigoMeteo ?? p.codigo ?? p.id ?? "",
+        reg: p.reg ?? p.region ?? p.Region ?? "",
+        orden: p.orden ?? p.Orden ?? 999,
+        fenomeno: p.fenomeno ?? p.fenómeno ?? p.evento ?? p.descripcion ?? "",
+        emision: p.emision ?? p.fecha ?? p.timestamp ?? "",
+      };
+    }
+
+    function colorByTipo(tipo) {
+      const t = (tipo || "").toLowerCase();
+      if (t.includes("aviso")) return "#f1c40f";
+      if (t.includes("alerta")) return "#e67e22";
+      if (t.includes("alarma")) return "#c0392b";
+      return "#64748b";
+    }
+
+    function styleFeature(feature) {
+      const p = normProps(feature.properties);
+      const color = colorByTipo(p.tipo);
+      return {
+        fillColor: color,
+        weight: 2,
+        opacity: 1,
+        color: "white",
+        dashArray: "3",
+        fillOpacity: 0.6,
+      };
+    }
+
+    function bindFeature(feature, layer) {
+      const p = normProps(feature.properties);
+      const html = `
+        <div class="font-sans">
+          <div class="font-bold text-sm uppercase mb-1 border-b pb-1">${p.tipo || "Sin tipo"}</div>
+          <div class="text-xs"><b>Código:</b> ${p.codigoMeteo || "-"}</div>
+          <div class="text-xs"><b>Región:</b> ${p.reg || "-"}</div>
+          <div class="text-xs"><b>Fenómeno:</b> ${p.fenomeno || "-"}</div>
+          <div class="text-xs text-gray-500 mt-1"><em>${p.emision || ""}</em></div>
+        </div>
+      `;
+      layer.bindPopup(html);
+      layer.bindTooltip(`${p.tipo || "Evento"}: ${p.fenomeno || ""}`, { sticky: true });
+    }
+
+    // ==============================
+    // DATA
+    // ==============================
+    async function fetchData() {
+      const loading = document.getElementById("loading");
+      const lastUpdate = document.getElementById("last-update");
+
+      clearStatus();
+      loading.classList.remove("hidden");
+
+      try {
+        const resp = await fetch(DATA_URL, { cache: "no-store" });
+        if (!resp.ok) throw new Error("HTTP " + resp.status);
+
+        rawData = await resp.json();
+
+        if (!rawData || !Array.isArray(rawData.features)) {
+          throw new Error("GeoJSON inválido (no existe 'features' como arreglo).");
+        }
+
+        lastUpdate.textContent = "Actualizado: " + new Date().toLocaleString();
+
+        populateRegions();
+        updateDashboard();
+
+      } catch (err) {
+        // Mensaje típico cuando es CORS:
+        // TypeError: Failed to fetch  (o) blocked by CORS policy (en consola)
+        console.error(err);
+
+        lastUpdate.textContent = "⚠ Error de carga";
+        setStatus(
+          "error",
+          `<b>No se pudieron cargar los datos.</b><br/>
+          Si estás en GitHub Pages, esto suele ser <b>CORS</b> del bucket de Google Cloud Storage.<br/>
+          <span class="text-xs">Detalle: ${escapeHtml(String(err))}</span>`
+        );
+
+        // Deja el dashboard "vacío" pero estable
+        rawData = { type: "FeatureCollection", features: [] };
+        populateRegions();
+        updateDashboard();
+
+      } finally {
+        loading.classList.add("hidden");
+      }
+    }
+
+    // ==============================
+    // DASHBOARD
+    // ==============================
+    function populateRegions() {
+      const select = document.getElementById("region-filter");
+      const current = select.value;
+
+      const mapRegions = new Map();
+      (rawData.features || []).forEach(f => {
+        const p = normProps(f.properties);
+        if (p.reg) mapRegions.set(p.reg, p.orden ?? 999);
+      });
+
+      const regions = Array.from(mapRegions.entries())
+        .sort((a, b) => a[1] - b[1])
+        .map(x => x[0]);
+
+      select.innerHTML = `<option value="Todas">Todas</option>`;
+      regions.forEach(r => {
+        const opt = document.createElement("option");
+        opt.value = r;
+        opt.textContent = r;
+        select.appendChild(opt);
+      });
+
+      if (regions.includes(current)) select.value = current;
+      select.onchange = updateDashboard;
+    }
+
+    function updateDashboard() {
+      const region = document.getElementById("region-filter").value;
+
+      const features = (rawData.features || []).filter(f => {
+        const p = normProps(f.properties);
+        return region === "Todas" ? true : (p.reg === region);
+      });
+
+      updateKPIs(features);
+      updateTable(features);
+      updateChart(features);
+      updateMap(features);
+    }
+
+    function updateKPIs(features) {
+      const byCode = new Map(); // codigo -> tipo (1 evento único)
+      features.forEach(f => {
+        const p = normProps(f.properties);
+        const key = p.codigoMeteo || `feature_${Math.random().toString(16).slice(2)}`;
+        byCode.set(key, p.tipo);
+      });
+
+      let aviso = 0, alerta = 0, alarma = 0;
+      byCode.forEach(tipo => {
+        const t = (tipo || "").toLowerCase();
+        if (t.includes("aviso")) aviso++;
+        else if (t.includes("alerta")) alerta++;
+        else if (t.includes("alarma")) alarma++;
+      });
+
+      document.getElementById("kpi-aviso").textContent = aviso;
+      document.getElementById("kpi-alerta").textContent = alerta;
+      document.getElementById("kpi-alarma").textContent = alarma;
+      document.getElementById("kpi-total").textContent = byCode.size;
+    }
+
+    function updateTable(features) {
+      const tbody = document.getElementById("tbody");
+      tbody.innerHTML = "";
+
+      const seen = new Set();
+      const rows = [];
+
+      for (const f of features) {
+        const p = normProps(f.properties);
+        const key = `${p.codigoMeteo}-${p.reg}-${p.fenomeno}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+
+        const t = (p.tipo || "").toLowerCase();
+        let badge = "bg-gray-100 text-gray-800";
+        if (t.includes("aviso")) badge = "bg-yellow-100 text-yellow-800";
+        if (t.includes("alerta")) badge = "bg-orange-100 text-orange-800";
+        if (t.includes("alarma")) badge = "bg-red-100 text-red-800";
+
+        rows.push(`
+          <tr class="hover:bg-gray-50">
+            <td class="px-2 py-3"><span class="px-2 py-1 rounded-full text-[11px] font-bold ${badge}">${escapeHtml(p.tipo || "Sin tipo")}</span></td>
+            <td class="px-2 py-3 font-semibold text-gray-700">${escapeHtml(p.reg || "-")}</td>
+            <td class="px-2 py-3 text-gray-600 truncate max-w-[240px]" title="${escapeHtml(p.fenomeno || "")}">
+              ${escapeHtml(p.fenomeno || "-")}
+            </td>
+          </tr>
+        `);
+
+        if (rows.length >= 30) break;
+      }
+
+      if (rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="3" class="text-center py-6 text-gray-500">Sin datos para mostrar.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = rows.join("");
+    }
+
+    function updateChart(features) {
+      const byCode = new Map();
+      features.forEach(f => {
+        const p = normProps(f.properties);
+        const key = p.codigoMeteo || `feature_${Math.random().toString(16).slice(2)}`;
+        byCode.set(key, p.tipo);
+      });
+
+      let aviso = 0, alerta = 0, alarma = 0;
+      byCode.forEach(tipo => {
+        const t = (tipo || "").toLowerCase();
+        if (t.includes("aviso")) aviso++;
+        else if (t.includes("alerta")) alerta++;
+        else if (t.includes("alarma")) alarma++;
+      });
+
+      const ctx = document.getElementById("chart").getContext("2d");
+      if (chart) chart.destroy();
+
+      chart = new Chart(ctx, {
+        type: "doughnut",
+        data: {
+          labels: ["Avisos", "Alertas", "Alarmas"],
+          datasets: [{
+            data: [aviso, alerta, alarma],
+            backgroundColor: ["#f1c40f", "#e67e22", "#c0392b"],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: "right" } },
+          cutout: "70%"
+        }
+      });
+    }
+
+    function updateMap(features) {
+      if (geoLayer) map.removeLayer(geoLayer);
+
+      if (!features || features.length === 0) return;
+
+      const fc = { type: "FeatureCollection", features: features };
+
+      geoLayer = L.geoJSON(fc, {
+        style: styleFeature,
+        onEachFeature: bindFeature
+      }).addTo(map);
+
+      try {
+        map.fitBounds(geoLayer.getBounds(), { padding: [40, 40] });
+      } catch (e) {
+        console.warn("No se pudo ajustar bounds:", e);
+      }
+    }
+
+    // ==============================
+    // Utils
+    // ==============================
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+  </script>
+</body>
+</html>
