@@ -14,13 +14,24 @@
     }
 
     .container {
-      max-width: 540px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      padding: 16px;
+      max-width: 1200px;
       margin: 0 auto;
-      padding: 16px 0;
     }
 
     .post {
-      margin-bottom: 28px;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* Ajuste fino para Instagram */
+    .instagram-media {
+      margin: 0 !important;
+      min-width: 320px !important;
+      width: 100% !important;
     }
   </style>
 </head>
@@ -57,3 +68,4 @@
   <script async src="https://www.instagram.com/embed.js"></script>
 </body>
 </html>
+
