@@ -3,69 +3,183 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Instagram SENAPRED</title>
+  <title>Redes Sociales SENAPRED</title>
 
   <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background: #ffffff;
+    :root{
+      --maxw: 1200px;
+      --gap: 20px;
+      --card-radius: 12px;
+      --card-border: #e6e6e6;
+    }
+
+    body{
+      margin:0;
+      padding:0;
+      background:#fff;
       font-family: Arial, sans-serif;
+      color:#111;
     }
 
-    .container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 24px;
-      padding: 16px;
-      max-width: 1200px;
+    .wrap{
+      max-width: var(--maxw);
       margin: 0 auto;
+      padding: 16px;
     }
 
-    .post {
-      display: flex;
-      justify-content: center;
+    /* ====== Sección título opcional ====== */
+    .header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom: 12px;
     }
 
-    /* Ajuste fino para Instagram */
-    .instagram-media {
-      margin: 0 !important;
-      min-width: 320px !important;
-      width: 100% !important;
+    .header h3{
+      margin:0;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .header .links{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      display:inline-block;
+      padding:8px 12px;
+      border:1px solid var(--card-border);
+      border-radius: 999px;
+      text-decoration:none;
+      color:#111;
+      font-size: 13px;
+      font-weight: 600;
+      background:#fff;
+    }
+    .btn:hover{ opacity:.85; }
+
+    /* ====== Grilla ====== */
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr)); /* 3 columnas fijas */
+      gap: var(--gap);
+      align-items: start;
+    }
+
+    /* Responsive */
+    @media (max-width: 1100px){
+      .grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 740px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    /* ====== “Tarjeta” para cada embed ====== */
+    .card{
+      border:1px solid var(--card-border);
+      border-radius: var(--card-radius);
+      padding: 10px;
+      background:#fff;
+      overflow:hidden; /* ayuda a mantener prolijo */
+    }
+
+    .card-title{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin: 0 0 8px 0;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .card-title a{
+      font-weight: 600;
+      font-size: 12px;
+      text-decoration:none;
+    }
+
+    /* Instagram: forzar ancho, evitar márgenes */
+    .instagram-media{
+      margin:0 !important;
+      width:100% !important;
+      min-width: 0 !important;
+    }
+
+    /* “Recorte” suave para minimizar cabeceras altas (NO garantizado) */
+    .ig-crop{
+      /* Esto recorta un poco arriba/abajo en pantallas grandes */
+      overflow:hidden;
+      border-radius: 10px;
     }
   </style>
 </head>
 
 <body>
-  <div class="container">
+  <div class="wrap">
 
-    <!-- REEL 1 -->
-    <div class="post">
-      <blockquote class="instagram-media"
-        data-instgrm-permalink="https://www.instagram.com/reel/DUB7qOukw7y/"
-        data-instgrm-version="14">
-      </blockquote>
+    <!-- Encabezado: links oficiales -->
+    <div class="header">
+      <h3>Redes oficiales SENAPRED</h3>
+      <div class="links">
+        <a class="btn" href="https://x.com/Senapred" target="_blank" rel="noopener">X / @Senapred</a>
+        <a class="btn" href="https://www.instagram.com/senapred/" target="_blank" rel="noopener">Instagram / @senapred</a>
+      </div>
     </div>
 
-    <!-- REEL 2 -->
-    <div class="post">
-      <blockquote class="instagram-media"
-        data-instgrm-permalink="https://www.instagram.com/reel/DT1HVuYkVVd/"
-        data-instgrm-version="14">
-      </blockquote>
-    </div>
+    <div class="grid">
 
-    <!-- POST 3 -->
-    <div class="post">
-      <blockquote class="instagram-media"
-        data-instgrm-permalink="https://www.instagram.com/p/DUBOD8uEUtf/"
-        data-instgrm-version="14">
-      </blockquote>
-    </div>
+      <!-- IG 1 -->
+      <div class="card">
+        <div class="card-title">
+          <span>Instagram – Reel 1</span>
+          <a href="https://www.instagram.com/reel/DUB7qOukw7y/" target="_blank" rel="noopener">Abrir</a>
+        </div>
+        <div class="ig-crop">
+          <blockquote class="instagram-media"
+            data-instgrm-permalink="https://www.instagram.com/reel/DUB7qOukw7y/"
+            data-instgrm-version="14">
+          </blockquote>
+        </div>
+      </div>
 
+      <!-- IG 2 -->
+      <div class="card">
+        <div class="card-title">
+          <span>Instagram – Reel 2</span>
+          <a href="https://www.instagram.com/reel/DT1HVuYkVVd/" target="_blank" rel="noopener">Abrir</a>
+        </div>
+        <div class="ig-crop">
+          <blockquote class="instagram-media"
+            data-instgrm-permalink="https://www.instagram.com/reel/DT1HVuYkVVd/"
+            data-instgrm-version="14">
+          </blockquote>
+        </div>
+      </div>
+
+      <!-- IG 3 -->
+      <div class="card">
+        <div class="card-title">
+          <span>Instagram – Post</span>
+          <a href="https://www.instagram.com/p/DUBOD8uEUtf/" target="_blank" rel="noopener">Abrir</a>
+        </div>
+        <div class="ig-crop">
+          <blockquote class="instagram-media"
+            data-instgrm-permalink="https://www.instagram.com/p/DUBOD8uEUtf/"
+            data-instgrm-version="14">
+          </blockquote>
+        </div>
+      </div>
+
+    </div>
   </div>
 
+  <!-- Script Instagram (uno solo para todos) -->
   <script async src="https://www.instagram.com/embed.js"></script>
 </body>
 </html>
+
 
