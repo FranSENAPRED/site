@@ -4,9 +4,9 @@ const cards = [
   { icon:"👥", value:"21.788", label:"Personas damnificadas", detail:"426 personas albergadas" },
   { icon:"🏚️", value:"4.044", label:"Viviendas destruidas", detail:"Ficha Básica de Emergencia" },
   { icon:"📢", value:"215", label:"Mensajes SAE enviados", detail:"Desde el 17/01/2026" },
-  { icon:"🚁", value:"135", label:"Aeronaves desplegadas", detail:"CONAF, SENAPRED, EMCO y empresas forestales" },
+  { icon:"🚁", value:"129", label:"Aeronaves desplegadas", detail:"CONAF, SENAPRED, EMCO y empresas forestales" },
   { icon:"👮‍♂️", value:"+1.400", label:"Carabineros desplegados", detail:"Personal policial en terreno" },
-  { icon:"🤝", value:"1.237", label:"Voluntarios desplegados", detail:"Apoyo humanitario y rehabilitación" }
+  { icon:"🤝", value:"1.218", label:"Voluntarios desplegados", detail:"Apoyo humanitario y rehabilitación" }
 ];
 
 const grid = document.querySelector(".grid");
