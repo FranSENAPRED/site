@@ -88,32 +88,14 @@
                     <option value="" disabled selected>Selecciona una variable</option>
                     <option value="precipitacion">Precipitación (mm en 24h)</option>
                     <option value="viento">Intensidad del Viento (km/h)</option>
-                    <option value="heladas">Heladas ($^{\circ}C$)</option>
-                    <option value="altas_temperaturas">Altas Temperaturas ($^{\circ}C$)</option>
+                    <option value="heladas">Heladas (°C)</option>
                 </select>
-            </div>
-
-            <!-- Campo Condicional de Valor de Temperatura (para Altas Temperaturas) -->
-            <div id="temp-date-container" class="md:col-span-2 hidden grid grid-cols-2 gap-4">
-                <div>
-                    <label for="temperatura_valor" class="block text-sm font-medium text-gray-700 mb-1">4a. Valor de la Temperatura ($^{\circ}C$):</label>
-                    <input type="number" id="temperatura_valor" name="temperatura_valor" step="0.1"
-                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-senapred-blue focus:border-senapred-blue sm:text-sm"
-                           placeholder="Ej: 32.5">
-                </div>
-                <div>
-                    <label for="temperatura_mes" class="block text-sm font-medium text-gray-700 mb-1">4b. Mes del Evento (para Umbrales):</label>
-                    <select id="temperatura_mes" name="temperatura_mes"
-                            class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-senapred-blue focus:border-senapred-blue sm:text-sm rounded-md shadow-sm">
-                        <!-- Opciones de mes cargadas por JS -->
-                    </select>
-                </div>
             </div>
 
             <!-- Campo Condicional de Valor de Precipitación/Viento/Helada -->
             <div id="general-value-container" class="md:col-span-2 hidden">
-                <label for="general_valor" class="block text-sm font-medium text-gray-700 mb-1">4. Valor de la Variable (Ver unidad arriba):</label>
-                <input type="number" id="general_valor" name="general_valor" step="0.1"
+                <label for="general_valor" id="general-valor-label" class="block text-sm font-medium text-gray-700 mb-1">3. Valor de la Variable:</label>
+                <input type="text" inputmode="decimal" id="general_valor" name="general_valor"
                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-senapred-blue focus:border-senapred-blue sm:text-sm"
                        placeholder="Ingresa el valor numérico">
             </div>
@@ -160,7 +142,7 @@
                 "Maule": ["LITORAL", "CORDILLERA COSTA", "VALLE LONGITUDINAL", "PRECORDILLERA", "CORDILLERA"],
                 "Ñuble": ["LITORAL", "CORDILLERA COSTA", "VALLE LONGITUDINAL", "PRECORDILLERA", "CORDILLERA"],
                 "Biobío": ["LITORAL", "CORDILLERA COSTA", "VALLE LONGITUDINAL", "PRECORDILLERA", "CORDILLERA"],
-                "Araucanía": ["LITORAL", "CORDILLERA COSTA", "VALLE LONGITUDINAL", "PRECORDILLERA", "CORDILLERA"],
+                "La Araucanía": ["LITORAL", "CORDILLERA COSTA", "VALLE LONGITUDINAL", "PRECORDILLERA", "CORDILLERA"],
                 "Los Ríos": ["LITORAL", "CORDILLERA COSTA", "VALLE LONGITUDINAL", "PRECORDILLERA", "CORDILLERA"],
                 "Los Lagos": ["LITORAL", "CORDILLERA COSTA", "VALLE LONGITUDINAL", "PRECORDILLERA", "CORDILLERA", "CHILOÉ", "LITORAL INTERIOR", "CORDILLERA AUSTRAL", "PATAGONIA SUBANDINA"],
                 "Aysén": ["INSULAR NORTE", "LITORAL INTERIOR", "CORDILLERA AUSTRAL NORTE", "PATAGONIA SUBANDINA NORTE", "INSULAR SUR", "CORDILLERA AUSTRAL SUR", "PATAGONIA SUBANDINA SUR"],
@@ -247,7 +229,7 @@
                     "PRECORDILLERA": { N: "25-34.9", M: "35-59.9", F: "60-85", I: "> 85" },
                     "CORDILLERA": { N: "30-39.9", M: "40-64.9", F: "65-90", I: "> 90" },
                 },
-                "Araucanía": {
+                "La Araucanía": {
                     "LITORAL": { N: "30-54.9", M: "55-74.9", F: "75-95", I: "> 95" },
                     "CORDILLERA COSTA": { N: "35-59.9", M: "60-79.9", F: "80-100", I: "> 100" },
                     "VALLE LONGITUDINAL": { N: "25-49.9", M: "50-69.9", F: "70-90", I: "> 90" },
@@ -372,7 +354,7 @@
                     "PRECORDILLERA": { N: "30-46", M: "47-60", F: "61-85", I: ">85" },
                     "CORDILLERA": { N: "40-50", M: "51-84", F: "85-100", I: ">100" },
                 },
-                "Araucanía": {
+                "La Araucanía": {
                     "LITORAL": { N: "36-56", M: "57-74", F: "75-94", I: ">94" },
                     "CORDILLERA COSTA": { N: "47-65", M: "66-84", F: "85-112", I: ">112" },
                     "VALLE LONGITUDINAL": { N: "36-56", M: "57-74", F: "75-94", I: ">94" },
@@ -419,53 +401,24 @@
 
             // Definiciones de Rangos para Heladas (°C) - Tabla 7.6
             FROST: {
-                "Arica y Parinacota": { N: "--", M: "--", I: "--", E: "--" }, // Asumiendo que la helada "Normal" no se clasifica
-                "Tarapacá": { N: "0 a -1", M: "-1.1 a -3", I: "-3.1 a -5", E: "< -5" },
-                "Antofagasta": { N: "0 a -1", M: "-1.1 a -3", I: "-3.1 a -5", E: "< -5" },
-                "Atacama": { N: "0 a -2", M: "-2.1 a -4", I: "-4.1 a -6", E: "< -6" },
-                "Coquimbo": { N: "0 a -2", M: "-2.1 a -4", I: "-4.1 a -6", E: "< -6" },
+                "Arica y Parinacota": { N: "--", M: "--", I: "--", E: "--" }, // No aplica (Tabla 7.6)
+                "Tarapacá": { N: "--", M: "--", I: "--", E: "--" },           // No aplica (Tabla 7.6)
+                "Antofagasta": { N: "--", M: "--", I: "--", E: "--" },         // No aplica (Tabla 7.6)
+                "Atacama": { N: "0 a -1", M: "-1.1 a -3", I: "-3.1 a -5", E: "< -5" },
+                "Coquimbo": { N: "0 a -1", M: "-1.1 a -3", I: "-3.1 a -5", E: "< -5" },
                 "Valparaíso": { N: "0 a -2", M: "-2.1 a -4", I: "-4.1 a -6", E: "< -6" },
                 "Metropolitana": { N: "0 a -2", M: "-2.1 a -4", I: "-4.1 a -6", E: "< -6" },
                 "O'Higgins": { N: "0 a -2", M: "-2.1 a -4", I: "-4.1 a -6", E: "< -6" },
                 "Maule": { N: "0 a -2", M: "-2.1 a -4", I: "-4.1 a -6", E: "< -6" },
                 "Ñuble": { N: "0 a -2", M: "-2.1 a -4", I: "-4.1 a -6", E: "< -6" },
                 "Biobío": { N: "0 a -2", M: "-2.1 a -4", I: "-4.1 a -6", E: "< -6" },
-                "Araucanía": { N: "0 a -3", M: "-3.1 a -5", I: "-5.1 a -7", E: "< -7" },
+                "La Araucanía": { N: "0 a -3", M: "-3.1 a -5", I: "-5.1 a -7", E: "< -7" },
                 "Los Ríos": { N: "0 a -3", M: "-3.1 a -5", I: "-5.1 a -7", E: "< -7" },
                 "Los Lagos": { N: "0 a -4", M: "-4.1 a -6", I: "-6.1 a -9", E: "< -9" },
                 "Aysén": { N: "0 a -6", M: "-6.1 a -9", I: "-9.1 a -15", E: "< -15" },
                 "Magallanes": { N: "0 a -5", M: "-5.1 a -9", I: "-9.1 a -15", E: "< -15" },
             },
 
-            // Definiciones de Umbrales para Altas Temperaturas (°C) - Tablas 7.7 y 7.8
-            HIGH_TEMP_MONTHS: ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"],
-            HIGH_TEMP_THRESHOLDS: {
-                // Tabla 7.7 (Umbrales Normales/Aviso/Alerta - Límite inferior de Alto/Fuerte)
-                "Metropolitana": {
-                    "CORDILLERA COSTA": { NOV: 30, DIC: 32, ENE: 32, FEB: 32, MAR: 30 },
-                    "VALLE LONGITUDINAL": { NOV: 31, DIC: 33, ENE: 33, FEB: 33, MAR: 32 },
-                    "PRECORDILLERA": { NOV: 31, DIC: 33, ENE: 33, FEB: 33, MAR: 32 },
-                },
-                // Se completaría con todos los datos de las Tablas 7.7 y 7.8, pero para simplificar
-                // y demostrar la funcionalidad, usaremos un subconjunto.
-                // Usaré la región de Atacama como ejemplo para la prueba de concepto.
-                "Atacama": {
-                    "LITORAL": { NOV: 26, DIC: 27, ENE: 27, FEB: 27, MAR: 26, ABR: 26, MAY: 26, JUN: 25, JUL: 25, AGO: 26, SEP: 25, OCT: 26 },
-                    "CORDILLERA COSTA Y VALLES TRANSVERSALES": { NOV: 30, DIC: 31, ENE: 31, FEB: 31, MAR: 30, ABR: 29, MAY: 29, JUN: 28, JUL: 28, AGO: 29, SEP: 28, OCT: 29 },
-                },
-                // También incluiremos los Umbrales Extremos de la Tabla 7.8 (para la clasificación Extrema)
-                EXTREME_THRESHOLDS: {
-                    "Metropolitana": {
-                        "CORDILLERA COSTA": { NOV: 32, DIC: 34, ENE: 34, FEB: 34, MAR: 33 },
-                        "VALLE LONGITUDINAL": { NOV: 34, DIC: 35, ENE: 35, FEB: 35, MAR: 34 },
-                        "PRECORDILLERA": { NOV: 33, DIC: 35, ENE: 35, FEB: 35, MAR: 34 },
-                    },
-                     "Atacama": {
-                        "LITORAL": { NOV: 27, DIC: 28, ENE: 31, FEB: 31, MAR: 31, ABR: 31, MAY: 31, JUN: 31, JUL: 31, AGO: 31, SEP: 31, OCT: 31 }, // Los meses no veraniegos de T Extrema en Atacama son 31
-                        "CORDILLERA COSTA Y VALLES TRANSVERSALES": { NOV: 33, DIC: 33, ENE: 33, FEB: 33, MAR: 33, ABR: 33, MAY: 33, JUN: 33, JUL: 33, AGO: 33, SEP: 33, OCT: 33 }, // Todos 33
-                    }
-                }
-            }
         };
 
         // --- 2. FUNCIONES DE PARSEO Y CÁLCULO ---
@@ -477,26 +430,31 @@
          * @returns {boolean}
          */
         function checkRange(value, rangeStr) {
-            rangeStr = rangeStr.replace(/\s/g, ''); // Eliminar espacios
+            rangeStr = rangeStr.trim();
+            if (!rangeStr || rangeStr === '--') return false;
 
             if (rangeStr.startsWith('>')) {
-                const limit = parseFloat(rangeStr.substring(1));
-                return value > limit;
-            } else if (rangeStr.startsWith('<')) {
-                const limit = parseFloat(rangeStr.substring(1));
-                return value < limit;
-            } else if (rangeStr.includes('a') || rangeStr.includes('-')) {
-                const parts = rangeStr.replace('a', '-').split('-');
-                const min = parseFloat(parts[0]);
-                const max = parseFloat(parts[1]);
-                
-                // Para el caso de heladas, si el rango es 0 a -2, el valor debe ser <=0 y >=-2
-                if (min >= 0 && max < 0) {
-                     return value <= min && value >= max;
-                }
-                // Para rangos normales de precipitación/viento (ej: 30-44.9)
-                return value >= min && value <= max;
+                return value > parseFloat(rangeStr.substring(1));
             }
+            if (rangeStr.startsWith('<')) {
+                return value < parseFloat(rangeStr.substring(1));
+            }
+
+            // Formato "X a Y" usado en datos de heladas (ej: "0 a -1", "-3.1 a -5")
+            if (rangeStr.includes(' a ')) {
+                const parts = rangeStr.split(' a ');
+                const a = parseFloat(parts[0]);
+                const b = parseFloat(parts[1]);
+                if (isNaN(a) || isNaN(b)) return false;
+                return value >= Math.min(a, b) && value <= Math.max(a, b);
+            }
+
+            // Formato "X-Y" usado en precipitación y viento (ej: "30-44.9")
+            const match = rangeStr.match(/^(-?[\d.]+)-(-?[\d.]+)$/);
+            if (match) {
+                return value >= parseFloat(match[1]) && value <= parseFloat(match[2]);
+            }
+
             return false;
         }
         
@@ -524,7 +482,8 @@
             for (const key in categories) {
                 const rangeStr = zoneData[key];
                 if (checkRange(value, rangeStr)) {
-                    return { category: categories[key].name, detail: `El rango para la categoría ${categories[key].name} es: ${rangeStr} ${variable === 'precipitacion' ? 'mm' : 'km/h'}.` };
+                    const rangeDisplay = variable === 'precipitacion' ? rangeStr.replace(/\./g, ',') : rangeStr;
+                    return { category: categories[key].name, detail: `El rango para la categoría ${categories[key].name} es: ${rangeDisplay} ${variable === 'precipitacion' ? 'mm' : 'km/h'}.` };
                 }
             }
 
@@ -540,79 +499,40 @@
 
             if (!regionData) return { category: 'Error', detail: 'Datos de Heladas no definidos para la región.' };
 
+            // Verificar si la región no tiene clasificación de heladas (todos los rangos son "--")
+            const allNA = Object.values(regionData).every(v => v === '--');
+            if (allNA) return { category: 'No Aplica', detail: `La región ${region} no tiene clasificación de heladas según la Tabla 7.6 del Manual SENAPRED.` };
+
             // Se clasifica de Extrema a Normal
             const categories = {
-                E: { name: 'Extrema', color: 'bg-senapred-red' }, // < -X
-                I: { name: 'Intensa', color: 'bg-senapred-orange' }, // -X.1 a -Y
-                M: { name: 'Moderada', color: 'bg-senapred-yellow' }, // -X.1 a -Y
-                N: { name: 'Normal', color: 'bg-senapred-green' }, // 0 a -Y
+                E: { name: 'Extrema', color: 'bg-senapred-red' },
+                I: { name: 'Intensa', color: 'bg-senapred-orange' },
+                M: { name: 'Moderada', color: 'bg-senapred-yellow' },
+                N: { name: 'Normal', color: 'bg-senapred-green' },
             };
-            
+
             // Si el valor no es menor o igual a 0, no es helada.
-            if (value > 0) return { category: 'No Helada', detail: 'La temperatura no es de $0^{\circ}C$ o inferior. No aplica a la clasificación de Heladas.' };
+            if (value > 0) return { category: 'No Helada', detail: 'La temperatura no es de 0°C o inferior. No aplica a la clasificación de Heladas.' };
 
             for (const key in categories) {
                 const rangeStr = regionData[key];
                 if (rangeStr === "--") continue; // Ignorar rangos no definidos
 
                 if (checkRange(value, rangeStr)) {
-                    return { category: categories[key].name, detail: `El rango para la categoría ${categories[key].name} es: ${rangeStr} $^\circ C$.` };
+                    return { category: categories[key].name, detail: `El rango para la categoría ${categories[key].name} es: ${rangeStr.replace(/\./g, ',')} °C.` };
                 }
             }
-            
-            return { category: 'No Clasificado', detail: 'El valor es inferior a $0^{\circ}C$ pero no cae en ningún rango de helada definido.' };
-        }
 
-        /**
-         * Realiza la clasificación para Altas Temperaturas.
-         */
-        function classifyHighTemp(region, zona, value, month) {
-            const normalData = METEO_DATA.HIGH_TEMP_THRESHOLDS[region];
-            const extremeData = METEO_DATA.HIGH_TEMP_THRESHOLDS.EXTREME_THRESHOLDS[region];
-            
-            if (!normalData || !extremeData) return { category: 'Error', detail: `Datos de Altas Temperaturas (umbrales) no definidos para la región: ${region}.` };
-            
-            const zoneNormal = normalData[zona] ? normalData[zona][month] : null;
-            const zoneExtreme = extremeData[zona] ? extremeData[zona][month] : null;
-            
-            if (zoneNormal === null || zoneExtreme === null) return { category: 'Error', detail: `Umbrales no definidos para la Zona: ${zona} y Mes: ${month}.` };
-
-            const T_ALERTA = zoneNormal;
-            const T_ALARMA = zoneExtreme;
-
-            let category = 'Normal';
-            let color = 'bg-senapred-green';
-            let detail = `Umbral de Aviso/Alerta (Fuerte) es ${T_ALERTA}$^{\circ}C$. Umbral Extremo (Alarma) es ${T_ALARMA}^{\circ}C$.`;
-
-            if (value >= T_ALARMA) {
-                category = 'Extremo (Alarma)';
-                color = 'bg-senapred-red';
-                detail = `Supera el Umbral Extremo de ${T_ALARMA}^{\circ}C$. Evento Extremo de Altas Temperaturas. ${detail}`;
-            } else if (value >= T_ALERTA) {
-                category = 'Fuerte (Alerta)';
-                color = 'bg-senapred-orange';
-                detail = `Supera o iguala el Umbral de ${T_ALERTA}^{\circ}C$. Clasificado como Alerta Meteorológica. ${detail}`;
-            } else if (value >= T_ALERTA - 3) { // Asumiendo un rango moderado/aviso unos 3°C bajo el umbral de alerta (esto es una simplificación no explícita en el doc)
-                category = 'Moderado (Aviso)';
-                color = 'bg-senapred-yellow';
-                detail = `Por debajo del Umbral de Alerta, pero cercano al riesgo potencial. ${detail}`;
-            } else {
-                 category = 'Normal';
-                 color = 'bg-senapred-green';
-                 detail = `Por debajo del umbral de Aviso/Alerta (${T_ALERTA}^{\circ}C$). Condición normal para el mes de ${month}. ${detail}`;
-            }
-            
-            return { category, detail, color };
+            return { category: 'No Clasificado', detail: 'El valor es inferior a 0°C pero no cae en ningún rango de helada definido.' };
         }
 
         // --- 3. MANEJO DE EVENTOS Y UI ---
 
         const regionSelect = document.getElementById('region');
         const zonaSelect = document.getElementById('zona');
+        const zonaContainer = zonaSelect.closest('div');
         const variableSelect = document.getElementById('variable');
         const generalValueContainer = document.getElementById('general-value-container');
-        const tempDateContainer = document.getElementById('temp-date-container');
-        const temperaturaMesSelect = document.getElementById('temperatura_mes');
         const form = document.getElementById('meteorological-form');
         const resultBox = document.getElementById('result-box');
         const resultText = document.getElementById('result-text');
@@ -625,24 +545,18 @@
          * Inicializa los desplegables de Región y Mes.
          */
         function initializeForm() {
-            // Cargar Regiones
-            const regions = Object.keys(METEO_DATA.REGIONS).sort();
+            // Cargar Regiones en orden geográfico Norte a Sur
+            const regions = [
+                "Arica y Parinacota", "Tarapacá", "Antofagasta", "Atacama", "Coquimbo",
+                "Valparaíso", "Metropolitana", "O'Higgins", "Maule", "Ñuble", "Biobío",
+                "La Araucanía", "Los Ríos", "Los Lagos", "Aysén", "Magallanes"
+            ];
             regions.forEach(region => {
                 const option = document.createElement('option');
                 option.value = region;
                 option.textContent = region;
                 regionSelect.appendChild(option);
             });
-            
-            // Cargar Meses (para Altas Temperaturas)
-            METEO_DATA.HIGH_TEMP_MONTHS.forEach(month => {
-                const option = document.createElement('option');
-                option.value = month;
-                option.textContent = month;
-                temperaturaMesSelect.appendChild(option);
-            });
-            // Seleccionar el mes de ENE por defecto
-            temperaturaMesSelect.value = 'ENE';
         }
         
         /**
@@ -651,9 +565,8 @@
         regionSelect.addEventListener('change', () => {
             const selectedRegion = regionSelect.value;
             const zonas = METEO_DATA.REGIONS[selectedRegion] || [];
-            
+
             zonaSelect.innerHTML = '<option value="" disabled selected>Selecciona una zona</option>';
-            zonaSelect.disabled = zonas.length === 0;
 
             if (zonas.length > 0) {
                 zonas.forEach(zona => {
@@ -662,10 +575,15 @@
                     option.textContent = zona;
                     zonaSelect.appendChild(option);
                 });
+                // Solo habilitar zona si la variable activa no es heladas
+                if (variableSelect.value !== 'heladas') {
+                    zonaSelect.disabled = false;
+                }
             } else {
                 zonaSelect.innerHTML = '<option value="" disabled selected>No hay zonas definidas</option>';
+                zonaSelect.disabled = true;
             }
-            
+
             // Limpiar resultados anteriores
             resultContainer.classList.add('hidden');
         });
@@ -678,27 +596,40 @@
 
             // Resetear campos
             generalValueContainer.classList.add('hidden');
-            tempDateContainer.classList.add('hidden');
-            
             document.getElementById('general_valor').value = '';
-            document.getElementById('temperatura_valor').value = '';
-            
-            // Mostrar el campo de entrada correcto
-            if (variable === 'altas_temperaturas') {
-                tempDateContainer.classList.remove('hidden');
-            } else if (variable) {
-                generalValueContainer.classList.remove('hidden');
-                // Actualizar placeholder/label
-                const generalValorInput = document.getElementById('general_valor');
+
+            // Para Heladas, la zona no aplica: ocultar selector de zona
+            const generalValorLabel = document.getElementById('general-valor-label');
+            if (variable === 'heladas') {
+                zonaContainer.classList.add('hidden');
+                zonaSelect.disabled = true;
+                generalValorLabel.textContent = '3. Temperatura mínima (°C):';
+            } else {
+                zonaContainer.classList.remove('hidden');
+                zonaSelect.disabled = regionSelect.value === '';
                 if (variable === 'precipitacion') {
-                    generalValorInput.placeholder = 'Ingresa el valor en mm';
+                    generalValorLabel.textContent = '4. Precipitación (mm en 24h):';
                 } else if (variable === 'viento') {
-                    generalValorInput.placeholder = 'Ingresa el valor en km/h';
-                } else if (variable === 'heladas') {
-                    generalValorInput.placeholder = 'Ingresa la temperatura, ej: -4.5';
+                    generalValorLabel.textContent = '4. Intensidad del Viento (km/h):';
+                } else {
+                    generalValorLabel.textContent = '4. Valor de la Variable:';
                 }
             }
-             // Limpiar resultados anteriores
+
+            // Mostrar el campo de entrada de valor
+            if (variable) {
+                generalValueContainer.classList.remove('hidden');
+                const generalValorInput = document.getElementById('general_valor');
+                if (variable === 'precipitacion') {
+                    generalValorInput.placeholder = 'Ej: 12,5';
+                } else if (variable === 'viento') {
+                    generalValorInput.placeholder = 'Ej: 75';
+                } else if (variable === 'heladas') {
+                    generalValorInput.placeholder = 'Ej: -4,5';
+                }
+            }
+
+            // Limpiar resultados anteriores
             resultContainer.classList.add('hidden');
             messageContainer.classList.add('hidden');
         });
@@ -716,50 +647,36 @@
             const region = regionSelect.value;
             const zona = zonaSelect.value;
             const variable = variableSelect.value;
-            
-            if (!region || !zona || !variable) {
-                showMessage("Por favor, selecciona la Región, la Zona y la Variable.");
+
+            // Para heladas no se requiere zona
+            if (!region || !variable) {
+                showMessage("Por favor, selecciona la Región y la Variable.");
                 return;
             }
-            
-            let value, month, result;
-            
-            if (variable === 'altas_temperaturas') {
-                value = parseFloat(document.getElementById('temperatura_valor').value);
-                month = temperaturaMesSelect.value;
-                if (isNaN(value)) { showMessage("Por favor, ingresa un valor numérico de Temperatura."); return; }
-                result = classifyHighTemp(region, zona, value, month);
-                
-            } else {
-                value = parseFloat(document.getElementById('general_valor').value);
-                if (isNaN(value)) { showMessage("Por favor, ingresa un valor numérico para la variable."); return; }
+            if (variable !== 'heladas' && !zona) {
+                showMessage("Por favor, selecciona la Zona Geográfica.");
+                return;
+            }
 
-                if (variable === 'heladas') {
-                    // La clasificación de heladas depende solo de la región, no de la zona.
-                    result = classifyFrost(region, value);
-                    
-                } else if (variable === 'precipitacion' || variable === 'viento') {
-                    // Clasificación de precipitación y viento
-                    // Si no hay datos, significa que la región no está completamente implementada
-                    const dataCheck = (variable === 'precipitacion' ? METEO_DATA.PRECIPITATION : METEO_DATA.WIND);
-                    if (!dataCheck[region] || !dataCheck[region][zona.toUpperCase()]) {
-                        showMessage(`La clasificación para ${variable} en la zona ${zona} de ${region} no está completamente implementada en el sistema. Vuelve a intentar con otra región/zona (ej: Atacama/Litoral para Precipitación/Viento, o Metropolitana/VALLE LONGITUDINAL para Altas Temperaturas).`);
-                        return;
-                    }
-                    result = classifyGeneral(region, zona, value, variable);
+            let value, result;
+
+            value = parseFloat(document.getElementById('general_valor').value.replace(',', '.'));
+            if (isNaN(value)) { showMessage("Por favor, ingresa un valor numérico válido (ej: 4,5)."); return; }
+
+            if (variable === 'heladas') {
+                result = classifyFrost(region, value);
+            } else if (variable === 'precipitacion' || variable === 'viento') {
+                const dataCheck = (variable === 'precipitacion' ? METEO_DATA.PRECIPITATION : METEO_DATA.WIND);
+                if (!dataCheck[region] || !dataCheck[region][zona.toUpperCase()]) {
+                    showMessage(`La clasificación para ${variable} en la zona ${zona} de ${region} no está implementada en el sistema.`);
+                    return;
                 }
+                result = classifyGeneral(region, zona, value, variable);
             }
             
             // Mostrar resultado o error
             if (result.category.startsWith('Error') || result.category.startsWith('No Clasificado')) {
-                showMessage(result.detail);
-                
-                // Forzar el estilo de error si la clasificación falla
-                resultBox.className = 'p-6 rounded-lg shadow-xl text-center category-Extremo transition duration-500 ease-in-out';
-                resultText.textContent = result.category;
-                resultDetail.textContent = result.detail;
-                resultContainer.classList.remove('hidden');
-                
+                showMessage(`${result.category}: ${result.detail}`);
             } else {
                 displayResult(result);
             }
@@ -786,18 +703,20 @@
             
             // Asignar clase de color según categoría
             let colorClass = '';
-            if (result.category.includes('Normal')) colorClass = 'category-Normal';
-            else if (result.category.includes('Moderado')) colorClass = 'category-Moderado';
-            else if (result.category.includes('Fuerte') || result.category.includes('Intensa')) colorClass = 'category-Fuerte'; // Fuerte e Intensa (Heladas)
-            else if (result.category.includes('Intenso') || result.category.includes('Extremo')) colorClass = 'category-Intenso'; // Intenso (Precip/Viento) o Extremo
+            const cat = result.category;
+            if (cat === 'Normal') colorClass = 'category-Normal';
+            else if (cat === 'Moderado' || cat === 'Moderada') colorClass = 'category-Moderado';
+            else if (cat === 'Fuerte' || cat === 'Intensa') colorClass = 'category-Fuerte';
+            else if (cat === 'Intenso' || cat === 'Extrema') colorClass = 'category-Intenso';
+            else if (cat === 'No Helada' || cat === 'No Aplica') colorClass = 'bg-blue-500';
 
-            resultBox.classList.add(colorClass);
-            
-            resultText.textContent = result.category;
+            resultBox.classList.add(colorClass || 'bg-gray-500');
+
+            resultText.textContent = cat;
             resultDetail.textContent = result.detail;
 
-            // Ajuste especial para categorías Moderado (Amarillo) para mejor contraste
-             if (result.category.includes('Moderado')) {
+            // Moderado/Moderada en fondo amarillo necesita texto oscuro para contraste
+            if (cat === 'Moderado' || cat === 'Moderada') {
                 resultBox.classList.remove('text-white');
                 resultBox.classList.add('text-gray-800');
             } else {
